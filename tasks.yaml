@@ -1,0 +1,52 @@
+---
+- name: install selenium
+  pip:
+    name:
+      - selenium==3.141.0
+    virtualenv: /tmp/selenium/python
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+
+- name: check for chromedriver
+  changed_when: false
+  stat:
+    path: '/tmp/chromedriver_linux64.zip'
+  register: chromedriver_result
+
+- name: download chromedriver from remote
+  when: not chromedriver_result.stat.exists
+  get_url:
+    url: https://chromedriver.storage.googleapis.com/2.43/chromedriver_linux64.zip
+    dest: '/tmp/chromedriver_linux64.zip'
+    checksum: sha1:63bce01580d6bc488aa185d572500f342f10eeef
+    timeout: 180
+
+- name: check for headless chromium
+  changed_when: false
+  stat:
+    path: '/tmp/headless_chromium_69.zip'
+  register: headless_chromium_result
+
+- name: download headless chromium from remote
+  when: not headless_chromium_result.stat.exists
+  get_url:
+    url: https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-55/stable-headless-chromium-amazonlinux-2017-03.zip
+    dest: '/tmp/headless_chromium_69.zip'
+    checksum: sha1:85f5dd46b7191e2f025ec73e3b20e8c418a21d67
+    timeout: 300
+
+- name: create chromedriver directory
+  file:
+    path: /tmp/chromedriver
+    state: directory
+  become: yes
+
+- name: extract files into directory
+  unarchive:
+    src: '{{ item }}'
+    dest: /tmp/chromedriver
+    remote_src: yes
+  loop:
+    - /tmp/chromedriver_linux64.zip
+    - /tmp/headless_chromium_69.zip
+  become: yes
