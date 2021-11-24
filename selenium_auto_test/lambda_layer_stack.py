@@ -8,6 +8,16 @@ class LambdaLayerStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        pyyaml_layer = _lambda.LayerVersion(
+            self, 'Pyyaml',
+            code=_lambda.Code.from_asset('/tmp/pyyaml'),
+            compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
+            compatible_runtimes=[
+                _lambda.Runtime.PYTHON_3_6
+            ],
+            removal_policy=cdk.RemovalPolicy.DESTROY
+        )
+
         selenium_layer = _lambda.LayerVersion(
             self, 'Selenium',
             code=_lambda.Code.from_asset('/tmp/selenium'),
@@ -28,5 +38,6 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
+        self.pyyaml_layer = pyyaml_layer
         self.selenium_layer = selenium_layer
         self.chromedriver_layer = chromedriver_layer

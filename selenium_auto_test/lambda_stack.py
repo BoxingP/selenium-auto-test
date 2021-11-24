@@ -6,7 +6,8 @@ from aws_cdk import (
 
 
 class LambdaStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, selenium_layer, chromedriver_layer, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, pyyaml_layer, selenium_layer, chromedriver_layer,
+                 **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         lambda_role = iam.Role(
@@ -20,10 +21,10 @@ class LambdaStack(cdk.Stack):
         lambda_function = _lambda.Function(
             self, 'LambdaFunction',
             code=_lambda.Code.from_asset(path="./selenium_auto_test/lambda"),
-            handler="browse_web.lambda_handler",
+            handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
-            layers=[selenium_layer, chromedriver_layer],
-            memory_size=128,
+            layers=[pyyaml_layer, selenium_layer, chromedriver_layer],
+            memory_size=4096,
             role=lambda_role,
             timeout=cdk.Duration.seconds(900)
 

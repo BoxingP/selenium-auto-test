@@ -1,4 +1,12 @@
 ---
+- name: install pyyaml
+  pip:
+    name:
+      - pyyaml<5.5,>=3.10
+    virtualenv: /tmp/pyyaml/python
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+
 - name: install selenium
   pip:
     name:
