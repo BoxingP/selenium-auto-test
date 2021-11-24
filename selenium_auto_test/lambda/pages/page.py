@@ -13,7 +13,7 @@ class Page(object):
     def find_element(self, *locator):
         return self.driver.find_element(*locator)
 
-    def open(self, url):
+    def open(self, url=''):
         url = self.base_url + url
         self.driver.get(url)
 
