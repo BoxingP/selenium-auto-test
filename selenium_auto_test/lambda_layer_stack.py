@@ -48,7 +48,4 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
-        self.pytest_layer = pytest_layer
-        self.pyyaml_layer = pyyaml_layer
-        self.selenium_layer = selenium_layer
-        self.chromedriver_layer = chromedriver_layer
+        self.layers = [pytest_layer, pyyaml_layer, selenium_layer, chromedriver_layer]
