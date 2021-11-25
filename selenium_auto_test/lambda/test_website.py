@@ -1,14 +1,11 @@
-import unittest
+import os
 
-from tests.test_main_page import TestMainPage
-from tests.test_login_page import TestLoginPage
+import pytest
 
 
 def lambda_handler(event, context):
-    suite_main = unittest.TestLoader().loadTestsFromTestCase(TestMainPage)
-    suite_login = unittest.TestLoader().loadTestsFromTestCase(TestLoginPage)
-    all_tests = unittest.TestSuite([suite_main, suite_login])
-    unittest.TextTestRunner(verbosity=1).run(all_tests)
+    tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
+    pytest.main([tests_dir, '--alluredir=/tmp/allure_results', '--cache-clear'])
 
 
 if __name__ == '__main__':

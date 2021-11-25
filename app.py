@@ -20,7 +20,9 @@ lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'laye
                                       env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                           region=os.getenv("CDK_DEFAULT_REGION")))
 lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']),
-                           lambda_layer_stack.pyyaml_layer, lambda_layer_stack.selenium_layer,
+                           lambda_layer_stack.pytest_layer,
+                           lambda_layer_stack.pyyaml_layer,
+                           lambda_layer_stack.selenium_layer,
                            lambda_layer_stack.chromedriver_layer,
                            env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                region=os.getenv("CDK_DEFAULT_REGION")))

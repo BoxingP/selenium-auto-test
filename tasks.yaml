@@ -1,4 +1,13 @@
 ---
+- name: install pytest
+  pip:
+    name:
+      - allure-pytest==2.9.45
+      - pytest==6.2.5
+    virtualenv: /tmp/pytest/python
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+
 - name: install pyyaml
   pip:
     name:

@@ -5,17 +5,15 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class Page(object):
-    def __init__(self, driver, base_url='https://www.thermofisher.cn/'):
+    def __init__(self, driver, config):
         self.driver = driver
-        self.base_url = base_url
-        self.timeout = 30
+        self.config = config
 
     def find_element(self, *locator):
         return self.driver.find_element(*locator)
 
     def open(self, url=''):
-        url = self.base_url + url
-        self.driver.get(url)
+        self.driver.get(self.config['tested_page'] + url)
 
     def get_title(self):
         return self.driver.title
@@ -30,14 +28,14 @@ class Page(object):
 
     def wait_element(self, *locator):
         try:
-            WebDriverWait(self.driver, timeout=self.timeout).until(EC.presence_of_element_located(locator))
+            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.presence_of_element_located(locator))
         except TimeoutException:
             print('\n * ELEMENT NOT FOUND WITHIN GIVEN TIME! --> %s' % (locator[1]))
             self.driver.quit()
 
     def wait_element_to_be_clickable(self, *locator):
         try:
-            WebDriverWait(self.driver, timeout=self.timeout).until(EC.element_to_be_clickable(locator))
+            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.element_to_be_clickable(locator))
         except TimeoutException:
             print('\n * ELEMENT NOT CLICKABLE WITHIN GIVEN TIME! --> %s' % (locator[1]))
             self.driver.quit()

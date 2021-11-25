@@ -6,9 +6,9 @@ from utils.locators import MainPageLocators
 
 
 class MainPage(Page):
-    def __init__(self, driver):
+    def __init__(self, driver, config):
         self.locator = MainPageLocators
-        super(MainPage, self).__init__(driver)
+        super(MainPage, self).__init__(driver, config)
 
     def check_page_loaded(self):
         return True if self.find_element(*self.locator.LOGO) else False
@@ -20,4 +20,4 @@ class MainPage(Page):
         hover.click(sign_in_element)
         hover.perform()
         self.wait_element(*self.locator.LOGO)
-        return LoginPage(self.driver)
+        return LoginPage(self.driver, self.config)

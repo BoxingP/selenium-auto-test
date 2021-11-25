@@ -5,9 +5,9 @@ from utils.users import User
 
 
 class LoginPage(Page):
-    def __init__(self, driver):
+    def __init__(self, driver, config):
         self.locator = LoginPageLocators
-        super(LoginPage, self).__init__(driver)
+        super(LoginPage, self).__init__(driver, config)
 
     def enter_email(self, email):
         self.wait_element_to_be_clickable(*self.locator.EMAIL)
@@ -39,4 +39,4 @@ class LoginPage(Page):
     def login_with_valid_user(self, user):
         self.login(user)
         self.wait_element(*self.locator.CUSTOMER_NAME)
-        return HomePage(self.driver)
+        return HomePage(self.driver, self.config)

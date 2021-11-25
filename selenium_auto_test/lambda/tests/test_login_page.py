@@ -1,20 +1,24 @@
+import allure
+import pytest
+
 from pages.login_page import LoginPage
-from tests.test import Test
 
 
-class TestLoginPage(Test):
+@pytest.mark.usefixtures('setup', 'website_setup')
+class TestLoginPage:
 
-    def test_sign_in_with_invalid_user(self):
-        login_page = LoginPage(self.driver)
+    @allure.title('Login with invalid user test')
+    @allure.description('This is test of login with invalid user')
+    def test_login_failed(self, config):
+        login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
-        self.driver.implicitly_wait(10)
-        result = login_page.login_with_invalid_user('test')
-        self.assertIn('用户名称或密码不正确', result)
+        error_msg = '用户名称或密码不正确'
+        assert error_msg in login_page.login_with_invalid_user('test')
 
-    def test_sign_in_with_valid_user(self):
-        login_page = LoginPage(self.driver)
+    @allure.title('Login with valid user test')
+    @allure.description('This is test of login with valid user')
+    def test_login_passed(self, config):
+        login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
-        self.driver.implicitly_wait(10)
-        result = login_page.login_with_valid_user('boxing')
-        self.driver.implicitly_wait(10)
-        self.assertIn('cn/zh/home', result.get_url())
+        url_clip = 'cn/zh/home'
+        assert url_clip in login_page.login_with_valid_user('boxing').get_url()

@@ -1,0 +1,5 @@
+---
+browser: chrome
+headless_mode: True
+tested_page: 'https://www.thermofisher.cn/'
+timeout: 30
