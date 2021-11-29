@@ -1,4 +1,4 @@
 .idea
-selenium_auto_test/lambda/utils/users.yaml
+lambda/test_website/utils/users.yaml
 __pycache__
 .pytest_cache

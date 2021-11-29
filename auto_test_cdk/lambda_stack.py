@@ -72,7 +72,7 @@ class LambdaStack(cdk.Stack):
 
         lambda_function = _lambda.Function(
             self, 'LambdaFunction',
-            code=_lambda.Code.from_asset(path="./selenium_auto_test/lambda"),
+            code=_lambda.Code.from_asset(path="./lambda/test_website"),
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={

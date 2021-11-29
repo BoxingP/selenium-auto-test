@@ -4,9 +4,9 @@ import os
 import yaml
 from aws_cdk import core as cdk
 
-from selenium_auto_test.lambda_layer_stack import LambdaLayerStack
-from selenium_auto_test.lambda_stack import LambdaStack
-from selenium_auto_test.s3_bucket_stack import S3BucketStack
+from auto_test_cdk.lambda_layer_stack import LambdaLayerStack
+from auto_test_cdk.lambda_stack import LambdaStack
+from auto_test_cdk.s3_bucket_stack import S3BucketStack
 
 with open('aws_tags.yaml', 'r', encoding='UTF-8') as file:
     aws_tags = yaml.load(file, Loader=yaml.SafeLoader)
