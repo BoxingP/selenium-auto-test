@@ -7,6 +7,7 @@ from aws_cdk import core as cdk
 from auto_test_cdk.lambda_layer_stack import LambdaLayerStack
 from auto_test_cdk.lambda_stack import LambdaStack
 from auto_test_cdk.s3_bucket_stack import S3BucketStack
+from auto_test_cdk.scheduler_stack import SchedulerStack
 
 with open('aws_tags.yaml', 'r', encoding='UTF-8') as file:
     aws_tags = yaml.load(file, Loader=yaml.SafeLoader)
@@ -27,6 +28,9 @@ lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']),
                            lambda_layer_stack.layers, s3_bucket_stack.allure_results_bucket,
                            env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                region=os.getenv("CDK_DEFAULT_REGION")))
+scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), lambda_stack.lambda_functions,
+                                 env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
+                                                     region=os.getenv("CDK_DEFAULT_REGION")))
 for key, value in aws_tags.items():
     cdk.Tags.of(app).add(key, value or " ")
 cdk.Tags.of(s3_bucket_stack).add("application", "S3")

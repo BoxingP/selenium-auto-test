@@ -127,3 +127,6 @@ class LambdaStack(cdk.Stack):
             timeout=cdk.Duration.seconds(900)
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+
+        self.lambda_functions = {'test_website': test_website_lambda_function,
+                                 'generate_report': generate_report_lambda_function}
