@@ -1,6 +1,7 @@
 from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
+    aws_lambda as _lambda,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
     core as cdk
@@ -8,18 +9,24 @@ from aws_cdk import (
 
 
 class SchedulerStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, lambda_functions: dict, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         test_website_job = sfn_tasks.LambdaInvoke(
             self, 'TestWebsite',
-            lambda_function=lambda_functions.get('test_website'),
+            lambda_function=_lambda.Function.from_function_arn(
+                self, 'TestWebsiteLambda',
+                function_arn=cdk.Fn.import_value('TestWebsiteLambdaArn')
+            ),
             timeout=cdk.Duration.minutes(5)
         )
 
         generate_report_job = sfn_tasks.LambdaInvoke(
             self, 'GenerateReport',
-            lambda_function=lambda_functions.get('generate_report'),
+            lambda_function=_lambda.Function.from_function_arn(
+                self, 'GenerateReportLambda',
+                function_arn=cdk.Fn.import_value('GenerateReportArn')
+            ),
             timeout=cdk.Duration.minutes(5)
         )
 

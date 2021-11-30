@@ -58,4 +58,13 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
-        self.layers = [pytest_layer, pyyaml_layer, selenium_layer, chromedriver_layer, allure_layer]
+        cdk.CfnOutput(self, 'OutputPytestLayerArn',
+                      export_name='PytestLayerArn', value=pytest_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputPyyamlLayerArn',
+                      export_name='PyyamlLayerArn', value=pyyaml_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputSeleniumLayerArn',
+                      export_name='SeleniumLayerArn', value=selenium_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputChromedriverLayerArn',
+                      export_name='ChromedriverLayerArn', value=chromedriver_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputAllureLayerArn',
+                      export_name='AllureLayerArn', value=allure_layer.layer_version_arn)

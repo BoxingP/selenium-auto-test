@@ -13,7 +13,8 @@ class S3BucketStack(cdk.Stack):
                                           removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=False,
                                           block_public_access=s3.BlockPublicAccess.BLOCK_ALL)
         self.lifecycle_rules(allure_results_bucket, expiration=365, noncurrent_expiration=14)
-        self.allure_results_bucket = allure_results_bucket
+        cdk.CfnOutput(self, 'OutputAutoTestS3BucketName', export_name='AutoTestS3BucketName',
+                      value=allure_results_bucket.bucket_name)
 
     @staticmethod
     def lifecycle_rules(bucket, incomplete=7, is_transition=True, to_glacier=30, expiration=60,

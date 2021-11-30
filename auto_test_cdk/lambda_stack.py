@@ -1,14 +1,15 @@
 from aws_cdk import (
     aws_iam as iam,
     aws_lambda as _lambda,
-    aws_s3 as s3,
     core as cdk
 )
 
 
 class LambdaStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, lambda_layers: list, s3: s3.Bucket, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        s3_bucket_name = cdk.Fn.import_value('AutoTestS3BucketName')
 
         publish_logs_to_cloudwatch = iam.ManagedPolicy(self, 'PublishLogsPolicy',
                                                        managed_policy_name='-'.join(
@@ -37,24 +38,24 @@ class LambdaStack(cdk.Stack):
                                                         sid='AllowListOfSpecificBucket',
                                                         actions=['s3:ListBucket'],
                                                         resources=[
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name + '/*'
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
                                                         ]
                                                     ),
                                                     iam.PolicyStatement(
                                                         sid='AllowGetObjectOfSpecificBucket',
                                                         actions=['s3:GetObject'],
                                                         resources=[
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name + '/*'
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
                                                         ]
                                                     ),
                                                     iam.PolicyStatement(
                                                         sid='AllowPutObjectOfSpecificBucket',
                                                         actions=['s3:PutObject'],
                                                         resources=[
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3.bucket_name + '/*'
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
+                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
                                                         ]
                                                     )
                                                 ]
@@ -69,8 +70,8 @@ class LambdaStack(cdk.Stack):
                                                               sid='AllowDeleteObjectOfSpecificBucket',
                                                               actions=['s3:DeleteObjectVersion', 's3:DeleteObject'],
                                                               resources=[
-                                                                  'arn:aws-cn:s3:::' + s3.bucket_name,
-                                                                  'arn:aws-cn:s3:::' + s3.bucket_name + '/*'
+                                                                  'arn:aws-cn:s3:::' + s3_bucket_name,
+                                                                  'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
                                                               ]
                                                           )
                                                       ]
@@ -104,9 +105,18 @@ class LambdaStack(cdk.Stack):
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={
-                's3_bucket_name': s3.bucket_name
+                's3_bucket_name': s3_bucket_name
             },
-            layers=lambda_layers[0:-1],
+            layers=[
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'PytestLayer', layer_version_arn=cdk.Fn.import_value('PytestLayerArn')),
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'PyyamlLayer', layer_version_arn=cdk.Fn.import_value('PyyamlLayerArn')),
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'SeleniumLayer', layer_version_arn=cdk.Fn.import_value('SeleniumLayerArn')),
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'ChromedriverLayer', layer_version_arn=cdk.Fn.import_value('ChromedriverLayerArn'))
+            ],
             memory_size=4096,
             role=test_website_lambda_role,
             timeout=cdk.Duration.seconds(900)
@@ -119,14 +129,19 @@ class LambdaStack(cdk.Stack):
             handler="generate_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={
-                's3_bucket_name': s3.bucket_name
+                's3_bucket_name': s3_bucket_name
             },
-            layers=lambda_layers[-1:],
+            layers=[
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'AllureLayer', layer_version_arn=cdk.Fn.import_value('AllureLayerArn'))
+            ],
             memory_size=4096,
             role=generate_report_lambda_role,
             timeout=cdk.Duration.seconds(900)
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
-        self.lambda_functions = {'test_website': test_website_lambda_function,
-                                 'generate_report': generate_report_lambda_function}
+        cdk.CfnOutput(self, 'OutputTestWebsiteLambdaArn', export_name='TestWebsiteLambdaArn',
+                      value=test_website_lambda_function.function_arn)
+        cdk.CfnOutput(self, 'OutputGenerateReportArn', export_name='GenerateReportArn',
+                      value=generate_report_lambda_function.function_arn)

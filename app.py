@@ -25,12 +25,14 @@ lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'laye
                                       env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                           region=os.getenv("CDK_DEFAULT_REGION")))
 lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']),
-                           lambda_layer_stack.layers, s3_bucket_stack.allure_results_bucket,
                            env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                region=os.getenv("CDK_DEFAULT_REGION")))
-scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), lambda_stack.lambda_functions,
+scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']),
                                  env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                      region=os.getenv("CDK_DEFAULT_REGION")))
+scheduler_stack.add_dependency(lambda_stack)
+lambda_stack.add_dependency(lambda_layer_stack)
+lambda_stack.add_dependency(s3_bucket_stack)
 for key, value in aws_tags.items():
     cdk.Tags.of(app).add(key, value or " ")
 cdk.Tags.of(s3_bucket_stack).add("application", "S3")
