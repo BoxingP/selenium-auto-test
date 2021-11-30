@@ -48,4 +48,14 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
-        self.layers = [pytest_layer, pyyaml_layer, selenium_layer, chromedriver_layer]
+        allure_layer = _lambda.LayerVersion(
+            self, 'Allure',
+            code=_lambda.Code.from_asset('/tmp/allure'),
+            compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
+            compatible_runtimes=[
+                _lambda.Runtime.PYTHON_3_6
+            ],
+            removal_policy=cdk.RemovalPolicy.DESTROY
+        )
+
+        self.layers = [pytest_layer, pyyaml_layer, selenium_layer, chromedriver_layer, allure_layer]

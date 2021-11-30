@@ -59,29 +59,71 @@ class LambdaStack(cdk.Stack):
                                                     )
                                                 ]
                                                 )
-        lambda_role = iam.Role(
-            self, 'LambdaRole',
+        deleting_s3_object_policy = iam.ManagedPolicy(self, 'DeletingS3ObjectPolicy',
+                                                      managed_policy_name='-'.join(
+                                                          [construct_id, 'deleting s3 object policy'.replace(' ', '-')]
+                                                      ),
+                                                      description='Policy to delete S3 object',
+                                                      statements=[
+                                                          iam.PolicyStatement(
+                                                              sid='AllowDeleteObjectOfSpecificBucket',
+                                                              actions=['s3:DeleteObjectVersion', 's3:DeleteObject'],
+                                                              resources=[
+                                                                  'arn:aws-cn:s3:::' + s3.bucket_name,
+                                                                  'arn:aws-cn:s3:::' + s3.bucket_name + '/*'
+                                                              ]
+                                                          )
+                                                      ]
+                                                      )
+        test_website_lambda_role = iam.Role(
+            self, 'TestWebsiteLambdaRole',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
             description="IAM role for Lambda function",
             managed_policies=[
                 publish_logs_to_cloudwatch,
                 operating_s3_policy
             ],
-            role_name='-'.join([construct_id, 'role'.replace(' ', '-')]),
+            role_name='-'.join([construct_id, 'test website role'.replace(' ', '-')]),
         )
 
-        lambda_function = _lambda.Function(
-            self, 'LambdaFunction',
+        generate_report_lambda_role = iam.Role(
+            self, 'GenerateReportLambdaRole',
+            assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
+            description="IAM role for Lambda function",
+            managed_policies=[
+                publish_logs_to_cloudwatch,
+                operating_s3_policy,
+                deleting_s3_object_policy
+            ],
+            role_name='-'.join([construct_id, 'generate report role'.replace(' ', '-')]),
+        )
+
+        test_website_lambda_function = _lambda.Function(
+            self, 'TestWebsite',
             code=_lambda.Code.from_asset(path="./lambda/test_website"),
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={
                 's3_bucket_name': s3.bucket_name
             },
-            layers=lambda_layers,
+            layers=lambda_layers[0:-1],
             memory_size=4096,
-            role=lambda_role,
+            role=test_website_lambda_role,
             timeout=cdk.Duration.seconds(900)
-
         )
-        lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+        test_website_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+
+        generate_report_lambda_function = _lambda.Function(
+            self, 'GenerateReport',
+            code=_lambda.Code.from_asset(path="./lambda/generate_report"),
+            handler="generate_report.lambda_handler",
+            runtime=_lambda.Runtime.PYTHON_3_6,
+            environment={
+                's3_bucket_name': s3.bucket_name
+            },
+            layers=lambda_layers[-1:],
+            memory_size=4096,
+            role=generate_report_lambda_role,
+            timeout=cdk.Duration.seconds(900)
+        )
+        generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)

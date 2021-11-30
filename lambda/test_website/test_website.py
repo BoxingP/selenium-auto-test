@@ -28,7 +28,7 @@ def lambda_handler(event, context):
 
     pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear'])
 
-    upload_files_to_s3(allure_results_dir)
+    upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
 
 
 if __name__ == '__main__':
