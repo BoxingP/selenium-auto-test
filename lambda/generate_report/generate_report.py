@@ -42,7 +42,7 @@ def move_files_from_directory_to_another(source, target):
         if not os.path.exists(target):
             os.makedirs(target)
         for file in files:
-            shutil.move(os.path.join(source, file), target)
+            shutil.move(os.path.join(source, file), os.path.join(target, file))
 
 
 def empty_s3_directory(s3_directory, s3_bucket=os.environ['s3_bucket_name']):
@@ -63,7 +63,7 @@ def lambda_handler(event, context):
     download_files_from_s3(local_path, s3_directory='allure_results/')
     download_files_from_s3(local_path, s3_directory='allure_reports/history/')
     local_history_path = os.path.join(local_path, 'allure_reports/history/')
-    move_files_from_directory_to_another(local_history_path, os.path.join(local_results_path, 'history'))
+    move_files_from_directory_to_another(local_history_path, os.path.join(local_results_path, 'history/'))
     subprocess.run(['/opt/allure-2.16.1/bin/allure', 'generate', '-c', local_results_path, '-o', local_reports_path])
     upload_files_to_s3(local_reports_path, s3_directory='allure_reports')
     empty_s3_directory('allure_results/')
