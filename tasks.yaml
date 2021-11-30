@@ -96,3 +96,10 @@
   loop:
     - /tmp/allure-2.16.1.zip
   become: yes
+
+- name: import users' credentials
+  copy:
+    src: 'vars/selenium_auto_test_users.yaml'
+    dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/utils/users.yaml'
+    force: yes
+  become: yes
