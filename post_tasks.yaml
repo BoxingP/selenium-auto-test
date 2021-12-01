@@ -1,0 +1,21 @@
+---
+- name: get keypair name
+  block:
+    - name: get cloudformation outputs
+      set_fact:
+        outputs: '{{ lookup( "file", "/tmp/" + (project|replace(" ", "_")) + "_" + deploy_environment + "_" + (aws_credential.aws_account_id|string) + ".json" ) | from_json }}'
+    - name: set json query
+      set_fact:
+        query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, "ec2" )) }}".OutputAllureInstanceKeypair'
+    - name: get keypair name
+      set_fact:
+        keypair_name: '{{ outputs | json_query(query) }}'
+  delegate_to: 127.0.0.1
+
+- name: save private key to local
+  fetch:
+    src: '/tmp/{{ keypair_name }}.pem'
+    dest: '/tmp/'
+    flat: yes
+    fail_on_missing: yes
+  become: yes
