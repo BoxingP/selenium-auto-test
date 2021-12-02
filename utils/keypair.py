@@ -1,3 +1,5 @@
+import os
+
 import boto3
 import botocore
 
@@ -23,5 +25,6 @@ class Keypair(object):
                 keypair_path = '/tmp/' + keypair_name + '.pem'
                 with open(keypair_path, 'w') as file:
                     file.write(keypair.key_material)
+                os.chmod(keypair_path, 0o600)
                 print("New Key Pair", keypair_name, "created successfully and is stored in the path:", keypair_path)
                 return keypair_name
