@@ -54,5 +54,7 @@ for key, value in aws_tags.items():
 cdk.Tags.of(s3_bucket_stack).add("application", "S3")
 cdk.Tags.of(lambda_layer_stack).add("application", "LambdaLayer")
 cdk.Tags.of(lambda_stack).add("application", "Lambda")
+cdk.Tags.of(scheduler_stack).add("application", "Scheduler")
+cdk.Tags.of(vpc_stack).add("application", "VPC")
 cdk.Tags.of(ec2_stack).add("application", "EC2")
 app.synth()
