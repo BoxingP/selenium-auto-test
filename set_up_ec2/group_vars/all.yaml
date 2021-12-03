@@ -1,0 +1,10 @@
+---
+project: allure report
+owner_team: example team
+contact_email: creator@example.com
+use_motd_banner: true
+docker:
+  image_name: '{{ project | replace(" ", "-") }}'
+  image_tag: '1.0'
+  host_port: '80'
+  container_port: '8080'

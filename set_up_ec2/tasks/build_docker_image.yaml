@@ -1,0 +1,21 @@
+---
+- name: upload files to remote
+  copy:
+    src: '{{ playbook_dir }}/docker/{{ item }}'
+    dest: '/tmp/docker/'
+    force: yes
+  loop:
+    - Dockerfile
+    - default.conf
+    - index.html
+
+- name: build docker image
+  community.docker.docker_image:
+    name: '{{ docker.image_name }}'
+    tag: '{{ docker.image_tag }}'
+    build:
+      path: '/tmp/docker'
+    source: build
+    state: present
+    force_source: yes
+    force_tag: yes

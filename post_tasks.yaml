@@ -1,21 +1,82 @@
 ---
-- name: get keypair name
-  block:
-    - name: get cloudformation outputs
-      set_fact:
-        outputs: '{{ lookup( "file", "/tmp/" + (project|replace(" ", "_")) + "_" + deploy_environment + "_" + (aws_credential.aws_account_id|string) + ".json" ) | from_json }}'
-    - name: set json query
-      set_fact:
-        query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, "ec2" )) }}".OutputAllureInstanceKeypair'
-    - name: get keypair name
-      set_fact:
-        keypair_name: '{{ outputs | json_query(query) }}'
-  delegate_to: 127.0.0.1
+- name: get cdk outputs content
+  command: cat /tmp/cdk_outputs.json
+  register: cdk_outputs_content
 
-- name: save private key to local
+- name: read ec2 values from cdk outputs
+  set_fact:
+    ec2_values: '{{ cdk_outputs_content.stdout | from_json | json_query(query) }}'
+  vars:
+    query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, "ec2" )) }}"'
+
+- name: extract value
+  set_fact:
+    { "{{ item.name }}": "{{ ec2_values | json_query(item.value) }}" }
+  loop:
+    - { name: 'keypair_name', value: 'OutputAllureInstanceKeypair' }
+    - { name: 'ec2_public_ip', value: 'OutputAllurePublicIP' }
+
+- name: get play directory
+  set_fact:
+    play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}/set_up_ec2'
+
+- name: fetch template from remote
   fetch:
-    src: '/tmp/{{ keypair_name }}.pem'
+    src: '{{ play_path }}/inventories/hosts.yaml.j2'
     dest: '/tmp/'
     flat: yes
     fail_on_missing: yes
+
+- name: upload to remote
+  template:
+    src: '/tmp/hosts.yaml.j2'
+    dest: '{{ play_path }}/inventories/hosts.yaml'
+    force: yes
+
+- name: install ansible
+  yum:
+    name:
+      - epel-release
+      - ansible
+    state: present
   become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python2
+
+- name: wait for ec2 port 22 to become open
+  wait_for:
+    port: 22
+    host: '{{ ec2_public_ip }}'
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 300
+
+- name: install ansible requirements
+  command: 'ansible-galaxy collection install -r requirements.yaml'
+  args:
+    chdir: '{{ play_path }}'
+
+- name: set up ec2
+  command: 'ansible-playbook playbook.yaml'
+  args:
+    chdir: '{{ play_path }}'
+
+- name: save private key
+  block:
+    - name: store private key local
+      fetch:
+        src: '/tmp/{{ keypair_name }}.pem'
+        dest: '/tmp/'
+        flat: yes
+        fail_on_missing: yes
+        become: yes
+  always:
+    - name: check for private key remote
+      stat:
+        path: '/tmp/{{ keypair_name }}.pem'
+      register: file_result
+    - name: remove private key remote
+      file:
+        path: '/tmp/{{ keypair_name }}.pem'
+        state: absent
+      when: file_result.stat.exists

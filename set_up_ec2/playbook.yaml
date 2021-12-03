@@ -1,0 +1,37 @@
+---
+- name: get hosts facts
+  hosts: all
+  gather_facts: yes
+
+- name: get hosts facts
+  hosts: all
+  gather_facts: no
+  vars:
+    virtualenv: '{{ hostvars[inventory_hostname].ansible_env.HOME }}/.virtualenvs/{{ project | replace(" ", "-") }}-env'
+  tasks:
+    - name: init server environment
+      include_role:
+        name: init_server_environment
+      vars:
+        ansible_python_interpreter: /usr/bin/python2
+    - name: create python environment
+      include_role:
+        name: create_python_environment
+      vars:
+        requirements_file: 'vars/server_requirements.yaml'
+    - name: generate motd banner
+      include_role:
+        name: create_motd_banner
+      when: use_motd_banner
+    - name: install docker
+      include_role:
+        name: install_docker
+    - name: build docker image
+      block:
+        - include_tasks: tasks/build_docker_image.yaml
+      vars:
+        ansible_python_interpreter: '{{ virtualenv }}/bin/python3'
+      environment:
+        PATH: '{{ virtualenv }}/bin:{{ hostvars[inventory_hostname].ansible_env.PATH }}'
+    - name: set up docker container
+      include_tasks: tasks/set_up_docker_container.yaml

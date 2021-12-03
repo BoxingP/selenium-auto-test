@@ -1,0 +1,15 @@
+---
+- name: set container name
+  set_fact:
+    container_name: '{{ docker.image_name }}-{{ docker.image_tag }}'
+
+- name: check for containers that actually exist
+  shell: 'docker ps -aq --filter "name={{ container_name }}"'
+  register: found_containers
+
+- name: remove the containers found
+  shell: 'docker stop {{ found_containers.stdout }} && docker rm -f {{ found_containers.stdout }}'
+  when: found_containers.stdout
+
+- name: start docker container
+  command: 'docker run --name={{ container_name }} --detach -p {{ docker.host_port }}:{{ docker.container_port }}/tcp --restart=always {{ docker.image_name }}:{{ docker.image_tag }}'
