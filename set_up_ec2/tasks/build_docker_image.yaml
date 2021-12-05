@@ -1,13 +1,11 @@
 ---
 - name: upload files to remote
-  copy:
-    src: '{{ playbook_dir }}/docker/{{ item }}'
+  ansible.posix.synchronize:
+    src: '{{ playbook_dir }}/docker/'
     dest: '/tmp/docker/'
-    force: yes
-  loop:
-    - Dockerfile
-    - default.conf
-    - index.html
+    mode: push
+    delete: yes
+    recursive: yes
 
 - name: build docker image
   community.docker.docker_image:
