@@ -55,7 +55,7 @@ class EC2Stack(cdk.Stack):
         )
         allure_instance = ec2.Instance(
             self, 'AllureEC2',
-            instance_type=ec2.InstanceType('t2.micro'),
+            instance_type=ec2.InstanceType('t2.medium'),
             machine_image=amazon_linux_image,
             vpc=vpc,
             block_devices=[
