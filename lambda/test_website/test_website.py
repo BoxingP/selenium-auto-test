@@ -3,6 +3,7 @@ import os
 import boto3
 import botocore
 import pytest
+import yaml
 
 
 def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], s3_directory=''):
@@ -22,11 +23,24 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
                 client.upload_file(file_path, s3_bucket, s3_path)
 
 
+def generate_env_properties(target_path, config_path=os.path.join(os.path.dirname(__file__), 'config.yaml')):
+    with open(config_path, 'r', encoding='UTF-8') as file:
+        config = yaml.load(file, Loader=yaml.SafeLoader)
+    with open(os.path.join(target_path, 'environment.properties'), 'w', encoding='UTF-8') as file:
+        line1 = 'Browser=%s\n' % config['browser']
+        line2 = 'BrowserVersion=%s\n' % config['headless_chromium']
+        line3 = 'Environment=%s\n' % config['environment']
+        line4 = 'Python=%s\n' % config['python']
+        line5 = 'TestedPage=%s' % config['tested_page']
+        file.writelines([line1, line2, line3, line4, line5])
+
+
 def lambda_handler(event, context):
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
     allure_results_dir = '/tmp/allure_results'
 
     pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear'])
+    generate_env_properties(allure_results_dir)
 
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
 
