@@ -1,4 +1,6 @@
 import os
+import sys
+from io import StringIO
 
 import boto3
 import botocore
@@ -39,10 +41,17 @@ def lambda_handler(event, context):
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
     allure_results_dir = '/tmp/allure_results'
 
-    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear'])
+    original_output = sys.stdout
+    sys.stdout = StringIO()
+    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '-p', 'no:terminal'])
+    output = sys.stdout.getvalue()
+    number_of_failed = int(output.upper())
+    sys.stdout.close()
+    sys.stdout = original_output
     generate_env_properties(allure_results_dir)
-
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
+
+    return number_of_failed
 
 
 if __name__ == '__main__':

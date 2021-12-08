@@ -10,6 +10,7 @@ from auto_test_cdk.lambda_layer_stack import LambdaLayerStack
 from auto_test_cdk.lambda_stack import LambdaStack
 from auto_test_cdk.s3_bucket_stack import S3BucketStack
 from auto_test_cdk.scheduler_stack import SchedulerStack
+from auto_test_cdk.sns_stack import SNSStack
 from auto_test_cdk.vpc_stack import VPCStack
 from utils.keypair import Keypair
 
@@ -20,6 +21,7 @@ environment = aws_tags['environment']
 aws_tags_list = []
 for k, v in aws_tags.items():
     aws_tags_list.append({'Key': k, 'Value': v or ' '})
+subscribers = [aws_tags['application owner']]
 
 app = cdk.App()
 s3_bucket_stack = S3BucketStack(app, '-'.join([project, environment, 's3']),
@@ -44,7 +46,11 @@ ec2_stack = EC2Stack(app, '-'.join([project, environment, 'ec2']),
                          keypair_name='-'.join([project, environment, date_now, 'key']), aws_tags=aws_tags_list),
                      env=cdk.Environment(
                          account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")))
+sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), subscribers,
+                     env=cdk.Environment(
+                         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")))
 scheduler_stack.add_dependency(lambda_stack)
+scheduler_stack.add_dependency(sns_stack)
 lambda_stack.add_dependency(lambda_layer_stack)
 lambda_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(s3_bucket_stack)
@@ -57,4 +63,5 @@ cdk.Tags.of(lambda_stack).add("application", "Lambda")
 cdk.Tags.of(scheduler_stack).add("application", "Scheduler")
 cdk.Tags.of(vpc_stack).add("application", "VPC")
 cdk.Tags.of(ec2_stack).add("application", "EC2")
+cdk.Tags.of(sns_stack).add("application", "SNS")
 app.synth()

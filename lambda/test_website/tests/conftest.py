@@ -43,3 +43,25 @@ def setup(request, config):
     request.cls.driver = driver
     yield
     driver.quit()
+
+
+@pytest.mark.tryfirst
+def pytest_configure(config):
+    config.pluginmanager.register(NumberOfFailed(), 'number_of_failed')
+
+
+class NumberOfFailed(object):
+    def __init__(self):
+        self.passed = 0
+        self.failed = 0
+
+    def pytest_runtest_logreport(self, report):
+        if report.when != 'call':
+            return
+        if report.passed:
+            self.passed += 1
+        elif report.failed:
+            self.failed += 1
+
+    def pytest_sessionfinish(self, session, exitstatus):
+        print(self.failed)
