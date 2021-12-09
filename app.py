@@ -14,14 +14,14 @@ from auto_test_cdk.sns_stack import SNSStack
 from auto_test_cdk.vpc_stack import VPCStack
 from utils.keypair import Keypair
 
-with open('aws_tags.yaml', 'r', encoding='UTF-8') as file:
-    aws_tags = yaml.load(file, Loader=yaml.SafeLoader)
-project = aws_tags['project'].lower().replace(' ', '-')
-environment = aws_tags['environment']
+with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r', encoding='UTF-8') as file:
+    config = yaml.load(file, Loader=yaml.SafeLoader)
+project = config['project']
+environment = config['environment']
 aws_tags_list = []
-for k, v in aws_tags.items():
+for k, v in config['aws_tags'].items():
     aws_tags_list.append({'Key': k, 'Value': v or ' '})
-subscribers = [aws_tags['application owner']]
+subscribers = config['subscribers']
 
 app = cdk.App()
 s3_bucket_stack = S3BucketStack(app, '-'.join([project, environment, 's3']),
@@ -55,7 +55,7 @@ lambda_stack.add_dependency(lambda_layer_stack)
 lambda_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(vpc_stack)
-for key, value in aws_tags.items():
+for key, value in config['aws_tags'].items():
     cdk.Tags.of(app).add(key, value or " ")
 cdk.Tags.of(s3_bucket_stack).add("application", "S3")
 cdk.Tags.of(lambda_layer_stack).add("application", "LambdaLayer")
