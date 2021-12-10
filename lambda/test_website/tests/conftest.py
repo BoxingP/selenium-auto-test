@@ -1,7 +1,9 @@
 import os
 
+import allure
 import pytest
 import yaml
+from allure_commons.types import AttachmentType
 from utils.driver_factory import DriverFactory
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
@@ -40,7 +42,10 @@ def setup(request, config):
     driver = DriverFactory.get_driver(config['browser'], config['headless_mode'])
     driver.implicitly_wait(config['timeout'])
     request.cls.driver = driver
+    before_failed = request.session.testsfailed
     yield
+    if request.session.testsfailed != before_failed:
+        allure.attach(driver.get_screenshot_as_png(), name="Test failed", attachment_type=AttachmentType.PNG)
     driver.quit()
 
 
