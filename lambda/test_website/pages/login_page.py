@@ -1,6 +1,5 @@
-from pages.home_page import HomePage
 from pages.page import Page
-from utils.locators import LoginPageLocators
+from utils.locators import LoginPageLocators, MainPageLocators
 from utils.users import User
 
 
@@ -31,12 +30,7 @@ class LoginPage(Page):
         self.enter_password(user['password'])
         self.click_login_button()
 
-    def login_with_invalid_user(self, user):
-        self.login(user)
-        self.wait_element(*self.locator.ERROR_LABEL)
-        return self.find_element(*self.locator.ERROR_MESSAGE).text
-
-    def login_with_valid_user(self, user):
-        self.login(user)
-        self.wait_element(*self.locator.CUSTOMER_NAME)
-        return HomePage(self.driver, self.config)
+    def logout(self):
+        self.hover(*MainPageLocators.PROFILE_ENTRY)
+        self.find_element(*MainPageLocators.SIGN_OUT).click()
+        self.wait_element(*MainPageLocators.LOGO)

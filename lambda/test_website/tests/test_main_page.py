@@ -19,5 +19,6 @@ class TestMainPage:
     def test_login_page_opened(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open()
+        main_page.go_to_login_page()
         link_clip = 'account-center/signin-identifie'
-        assert link_clip in main_page.go_to_login_page().get_url()
+        assert link_clip in main_page.get_url()

@@ -2,7 +2,6 @@ import os
 
 import pytest
 import yaml
-
 from utils.driver_factory import DriverFactory
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')

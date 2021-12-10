@@ -5,6 +5,8 @@ class MainPageLocators(object):
     LOGO = (By.ID, 'hfLifetechLogoImage')
     ACCOUNT = (By.ID, 'myaccount-button')
     SIGN_IN = (By.ID, 'signIn')
+    PROFILE_ENTRY = (By.ID, 'hfUserProfileLink')
+    SIGN_OUT = (By.ID, 'hfB2cCmgtSignOutLink')
 
 
 class LoginPageLocators(object):
@@ -15,4 +17,3 @@ class LoginPageLocators(object):
     SUBMIT = (By.ID, 'signin-button')
     ERROR_LABEL = (By.XPATH, '//div[@id="login-error-text"]//span[@class="error-label"]')
     ERROR_MESSAGE = (By.ID, 'login-error-text')
-    CUSTOMER_NAME = (By.ID, 'hfCustomerName')
