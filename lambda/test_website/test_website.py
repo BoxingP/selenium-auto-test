@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 from io import StringIO
 
@@ -37,6 +38,18 @@ def generate_env_properties(target_path, config_path=os.path.join(os.path.dirnam
         file.writelines([line1, line2, line3, line4, line5])
 
 
+def empty_directory(directory='/tmp'):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
 def lambda_handler(event, context):
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
     allure_results_dir = '/tmp/allure_results'
@@ -50,6 +63,7 @@ def lambda_handler(event, context):
     sys.stdout = original_output
     generate_env_properties(allure_results_dir)
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
+    empty_directory()
 
     return number_of_failed
 
