@@ -54,3 +54,10 @@ class Page(object):
         except TimeoutException:
             print('\n * ELEMENT NOT CLICKABLE WITHIN GIVEN TIME! --> %s' % (locator[1]))
             self.driver.quit()
+
+    def wait_element_to_be_visible(self, *locator):
+        try:
+            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.visibility_of_element_located(locator))
+        except TimeoutException:
+            print('\n * ELEMENT NOT VISIBLE WITHIN GIVEN TIME! --> %s' % (locator[1]))
+            self.driver.quit()

@@ -9,10 +9,6 @@ class MainPage(Page):
         self.locator = MainPageLocators
         super(MainPage, self).__init__(driver, config)
 
-    @allure.step('Open main page')
-    def check_page_loaded(self):
-        return True if self.find_element(*self.locator.logo_image) else False
-
     @allure.step('Open login page')
     def go_to_login_page(self):
         self.hover(*self.locator.my_account_menu)
