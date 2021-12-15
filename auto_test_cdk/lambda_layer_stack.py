@@ -18,16 +18,6 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
-        pyyaml_layer = _lambda.LayerVersion(
-            self, 'Pyyaml',
-            code=_lambda.Code.from_asset('/tmp/pyyaml'),
-            compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
-            compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
-            ],
-            removal_policy=cdk.RemovalPolicy.DESTROY
-        )
-
         selenium_layer = _lambda.LayerVersion(
             self, 'Selenium',
             code=_lambda.Code.from_asset('/tmp/selenium'),
@@ -60,8 +50,6 @@ class LambdaLayerStack(cdk.Stack):
 
         cdk.CfnOutput(self, 'OutputPytestLayerArn',
                       export_name='PytestLayerArn', value=pytest_layer.layer_version_arn)
-        cdk.CfnOutput(self, 'OutputPyyamlLayerArn',
-                      export_name='PyyamlLayerArn', value=pyyaml_layer.layer_version_arn)
         cdk.CfnOutput(self, 'OutputSeleniumLayerArn',
                       export_name='SeleniumLayerArn', value=selenium_layer.layer_version_arn)
         cdk.CfnOutput(self, 'OutputChromedriverLayerArn',

@@ -1,13 +1,12 @@
+import json
 import os
-
-import yaml
 
 
 class User(object):
     def __init__(self):
         path = os.path.dirname(os.path.abspath(__file__))
-        with open(path + '/users.yaml', 'r', encoding='UTF-8') as file:
-            self.users = yaml.load(file, Loader=yaml.SafeLoader)
+        with open(path + '/users.json', 'r', encoding='UTF-8') as file:
+            self.users = json.load(file)
 
     def get_user(self, name):
         try:

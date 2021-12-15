@@ -1,12 +1,13 @@
+import json
 import os
 
 import allure
 import pytest
-import yaml
 from allure_commons.types import AttachmentType
+
 from utils.driver_factory import DriverFactory
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.json')
 DEFAULT_WAIT_TIME = 10
 DEFAULT_WEBSITE = 'https://www.baidu.com/'
 SUPPORTED_BROWSERS = ['chrome']
@@ -15,7 +16,7 @@ SUPPORTED_BROWSERS = ['chrome']
 @pytest.fixture(scope='session')
 def config():
     with open(CONFIG_PATH, 'r', encoding='UTF-8') as file:
-        return yaml.load(file, Loader=yaml.SafeLoader)
+        return json.load(file)
 
 
 @pytest.fixture(scope='session')

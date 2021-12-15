@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import sys
@@ -6,7 +7,6 @@ from io import StringIO
 import boto3
 import botocore
 import pytest
-import yaml
 
 
 def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], s3_directory=''):
@@ -26,9 +26,9 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
                 client.upload_file(file_path, s3_bucket, s3_path)
 
 
-def generate_env_properties(target_path, config_path=os.path.join(os.path.dirname(__file__), 'config.yaml')):
+def generate_env_properties(target_path, config_path=os.path.join(os.path.dirname(__file__), 'config.json')):
     with open(config_path, 'r', encoding='UTF-8') as file:
-        config = yaml.load(file, Loader=yaml.SafeLoader)
+        config = json.load(file)
     with open(os.path.join(target_path, 'environment.properties'), 'w', encoding='UTF-8') as file:
         line1 = 'Browser=%s\n' % config['browser']
         line2 = 'BrowserVersion=%s\n' % config['headless_chromium']

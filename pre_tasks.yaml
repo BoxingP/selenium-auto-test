@@ -9,14 +9,6 @@
     virtualenv_command: /usr/bin/python3 -m venv
   become: yes
 
-- name: install pyyaml
-  pip:
-    name:
-      - pyyaml<5.5,>=3.10
-    virtualenv: /tmp/pyyaml/python
-    virtualenv_command: /usr/bin/python3 -m venv
-  become: yes
-
 - name: install selenium
   pip:
     name:
@@ -100,7 +92,7 @@
 
 - name: import users' credentials
   copy:
-    src: 'vars/selenium_auto_test_users.yaml'
-    dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/utils/users.yaml'
+    src: 'vars/selenium_auto_test_users.json'
+    dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/utils/users.json'
     force: yes
   become: yes

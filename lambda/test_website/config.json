@@ -1,0 +1,9 @@
+{
+    "browser": "chrome",
+    "environment": "prod",
+    "headless_mode": true,
+    "headless_chromium": 69,
+    "python": 3.6,
+    "tested_page": "https://www.thermofisher.cn/",
+    "timeout": 30
+}

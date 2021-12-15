@@ -111,8 +111,6 @@ class LambdaStack(cdk.Stack):
                 _lambda.LayerVersion.from_layer_version_arn(
                     self, 'PytestLayer', layer_version_arn=cdk.Fn.import_value('PytestLayerArn')),
                 _lambda.LayerVersion.from_layer_version_arn(
-                    self, 'PyyamlLayer', layer_version_arn=cdk.Fn.import_value('PyyamlLayerArn')),
-                _lambda.LayerVersion.from_layer_version_arn(
                     self, 'SeleniumLayer', layer_version_arn=cdk.Fn.import_value('SeleniumLayerArn')),
                 _lambda.LayerVersion.from_layer_version_arn(
                     self, 'ChromedriverLayer', layer_version_arn=cdk.Fn.import_value('ChromedriverLayerArn'))
