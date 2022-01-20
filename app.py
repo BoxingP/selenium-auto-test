@@ -5,13 +5,13 @@ import os
 import yaml
 from aws_cdk import core as cdk
 
-from auto_test_cdk.ec2_stack import EC2Stack
-from auto_test_cdk.lambda_layer_stack import LambdaLayerStack
-from auto_test_cdk.lambda_stack import LambdaStack
-from auto_test_cdk.s3_bucket_stack import S3BucketStack
-from auto_test_cdk.scheduler_stack import SchedulerStack
-from auto_test_cdk.sns_stack import SNSStack
-from auto_test_cdk.vpc_stack import VPCStack
+from stacks.ec2_stack import EC2Stack
+from stacks.lambda_layer_stack import LambdaLayerStack
+from stacks.lambda_stack import LambdaStack
+from stacks.s3_bucket_stack import S3BucketStack
+from stacks.scheduler_stack import SchedulerStack
+from stacks.sns_stack import SNSStack
+from stacks.vpc_stack import VPCStack
 from utils.keypair import Keypair
 
 with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r', encoding='UTF-8') as file:
