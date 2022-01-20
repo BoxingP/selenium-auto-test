@@ -33,10 +33,18 @@
     dest: '{{ play_path }}/inventories/hosts.yaml'
     force: yes
 
-- name: install ansible
+- name: install epel-release
   yum:
     name:
       - epel-release
+    state: present
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python2
+
+- name: install ansible
+  yum:
+    name:
       - ansible
     state: present
   become: yes
