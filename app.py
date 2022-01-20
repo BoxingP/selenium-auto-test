@@ -22,9 +22,10 @@ aws_tags_list = []
 for k, v in config['aws_tags'].items():
     aws_tags_list.append({'Key': k, 'Value': v or ' '})
 subscribers = config['subscribers']
+is_versioned = config['aws_s3_versioned']
 
 app = cdk.App()
-s3_bucket_stack = S3BucketStack(app, '-'.join([project, environment, 's3']),
+s3_bucket_stack = S3BucketStack(app, '-'.join([project, environment, 's3']), is_versioned,
                                 env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
                                                     region=os.getenv("CDK_DEFAULT_REGION")))
 lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']),
