@@ -17,7 +17,9 @@ class SchedulerStack(cdk.Stack):
             self, 'TestWebsite',
             lambda_function=_lambda.Function.from_function_arn(
                 self, 'TestWebsiteLambda',
-                function_arn=cdk.Fn.import_value('TestWebsiteLambdaArn')
+                function_arn=cdk.Fn.import_value(
+                    construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'TestWebsiteLambdaArn'
+                )
             ),
             result_path='$',
             result_selector={
@@ -30,7 +32,9 @@ class SchedulerStack(cdk.Stack):
             self, 'GenerateReport',
             lambda_function=_lambda.Function.from_function_arn(
                 self, 'GenerateReportLambda',
-                function_arn=cdk.Fn.import_value('GenerateReportArn')
+                function_arn=cdk.Fn.import_value(
+                    construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'GenerateReportLambdaArn'
+                )
             ),
             result_path=sfn.JsonPath.DISCARD,
             timeout=cdk.Duration.minutes(5)
@@ -47,7 +51,9 @@ class SchedulerStack(cdk.Stack):
             self, 'SendNotification',
             topic=sns.Topic.from_topic_arn(
                 self, 'SendNotificationTopic',
-                topic_arn=cdk.Fn.import_value('SNSTopicArn')
+                topic_arn=cdk.Fn.import_value(
+                    construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'SnsTopicArn'
+                )
             ),
             message=sfn.TaskInput.from_json_path_at("$.message"),
             subject='There Are Failed Tests Occurred on the Website',

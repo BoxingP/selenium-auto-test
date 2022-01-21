@@ -1,4 +1,14 @@
 ---
+aws_ec2_ami: 'ami-0f8d4b3ca40ae0bc6'
+aws_ec2_inbounds:
+  - ip: '222.126.242.202/32'
+    port:
+      - 0 - 65535
+    description: 'from Shanghai office'
+  - ip: '222.126.242.203/32'
+    port:
+      - 0 - 65535
+    description: 'from Shanghai office'
 aws_s3_versioned: False
 aws_tags:
   app role: 'Digital Solutions China Operations'
@@ -9,6 +19,7 @@ aws_tags:
   division: 'DSC'
   environment: '{{ deploy_environment }}'
   project: '{{ project | title }}'
+aws_vpc_cidr: '10.5.0.0/16'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
 subscribers:

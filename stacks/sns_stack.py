@@ -11,11 +11,12 @@ class SNSStack(cdk.Stack):
 
         notification_topic = sns.Topic(self, 'SNSTopic',
                                        display_name='Tell Listeners That There Are Tests Failed on Website',
-                                       topic_name='-'.join([construct_id, 'sns topic'.replace(' ', '-')])
+                                       topic_name='-'.join([construct_id, 'topic'.replace(' ', '-')])
                                        )
         for subscriber in subscribers:
             notification_topic.add_subscription(subscriptions.EmailSubscription(email_address=subscriber))
         notification_topic.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
-        cdk.CfnOutput(self, 'OutputSNSTopicArn', export_name='SNSTopicArn',
+        cdk.CfnOutput(self, 'OutputSnsTopicArn',
+                      export_name=construct_id.title().replace('-', '') + 'TopicArn',
                       value=notification_topic.topic_arn)

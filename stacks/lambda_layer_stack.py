@@ -9,7 +9,7 @@ class LambdaLayerStack(cdk.Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         pytest_layer = _lambda.LayerVersion(
-            self, 'Pytest',
+            self, 'PytestLayer',
             code=_lambda.Code.from_asset('/tmp/pytest'),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
@@ -19,7 +19,7 @@ class LambdaLayerStack(cdk.Stack):
         )
 
         selenium_layer = _lambda.LayerVersion(
-            self, 'Selenium',
+            self, 'SeleniumLayer',
             code=_lambda.Code.from_asset('/tmp/selenium'),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
@@ -29,7 +29,7 @@ class LambdaLayerStack(cdk.Stack):
         )
 
         chromedriver_layer = _lambda.LayerVersion(
-            self, 'Chromedriver',
+            self, 'ChromedriverLayer',
             code=_lambda.Code.from_asset('/tmp/chromedriver'),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
@@ -39,7 +39,7 @@ class LambdaLayerStack(cdk.Stack):
         )
 
         allure_layer = _lambda.LayerVersion(
-            self, 'Allure',
+            self, 'AllureLayer',
             code=_lambda.Code.from_asset('/tmp/allure'),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
@@ -49,10 +49,14 @@ class LambdaLayerStack(cdk.Stack):
         )
 
         cdk.CfnOutput(self, 'OutputPytestLayerArn',
-                      export_name='PytestLayerArn', value=pytest_layer.layer_version_arn)
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'PytestLayerArn',
+                      value=pytest_layer.layer_version_arn)
         cdk.CfnOutput(self, 'OutputSeleniumLayerArn',
-                      export_name='SeleniumLayerArn', value=selenium_layer.layer_version_arn)
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'SeleniumLayerArn',
+                      value=selenium_layer.layer_version_arn)
         cdk.CfnOutput(self, 'OutputChromedriverLayerArn',
-                      export_name='ChromedriverLayerArn', value=chromedriver_layer.layer_version_arn)
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'ChromedriverLayerArn',
+                      value=chromedriver_layer.layer_version_arn)
         cdk.CfnOutput(self, 'OutputAllureLayerArn',
-                      export_name='AllureLayerArn', value=allure_layer.layer_version_arn)
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'AllureLayerArn',
+                      value=allure_layer.layer_version_arn)

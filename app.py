@@ -16,40 +16,38 @@ from utils.keypair import Keypair
 
 with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r', encoding='UTF-8') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
-project = config['project']
-environment = config['environment']
+
+ami = config['aws_ec2_ami']
+aws_environment = cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION"))
 aws_tags_list = []
 for k, v in config['aws_tags'].items():
     aws_tags_list.append({'Key': k, 'Value': v or ' '})
-subscribers = config['subscribers']
+environment = config['environment']
+inbounds = config['aws_ec2_inbounds']
 is_versioned = config['aws_s3_versioned']
+project = config['project']
+subscribers = config['subscribers']
+vpc_cidr = config['aws_vpc_cidr']
 
 app = cdk.App()
-s3_bucket_stack = S3BucketStack(app, '-'.join([project, environment, 's3']), is_versioned,
-                                env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
-                                                    region=os.getenv("CDK_DEFAULT_REGION")))
-lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']),
-                                      env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
-                                                          region=os.getenv("CDK_DEFAULT_REGION")))
-lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']),
-                           env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
-                                               region=os.getenv("CDK_DEFAULT_REGION")))
-scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']),
-                                 env=cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"),
-                                                     region=os.getenv("CDK_DEFAULT_REGION")))
-vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']),
-                     env=cdk.Environment(
-                         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")))
+s3_bucket_stack = S3BucketStack(
+    app, '-'.join([project, environment, 's3']),
+    bucket_name='-'.join([project, environment, 's3']), is_versioned=is_versioned, env=aws_environment
+)
+lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
+lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), env=aws_environment)
+scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), env=aws_environment)
+vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
 date_now = datetime.datetime.now().strftime("%Y%m%d")
-ec2_stack = EC2Stack(app, '-'.join([project, environment, 'ec2']),
-                     vpc_stack.vpc,
-                     Keypair.create_keypair(
-                         keypair_name='-'.join([project, environment, date_now, 'key']), aws_tags=aws_tags_list),
-                     env=cdk.Environment(
-                         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")))
-sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), subscribers,
-                     env=cdk.Environment(
-                         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")))
+ec2_stack = EC2Stack(
+    app, '-'.join([project, environment, 'ec2']),
+    vpc=vpc_stack.vpc, ami=ami, inbounds=inbounds,
+    keypair_name=Keypair.create_keypair(
+        keypair_name='-'.join([project, environment, date_now, 'key']), aws_tags=aws_tags_list
+    ),
+    env=aws_environment
+)
+sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), subscribers, env=aws_environment)
 scheduler_stack.add_dependency(lambda_stack)
 scheduler_stack.add_dependency(sns_stack)
 lambda_stack.add_dependency(lambda_layer_stack)

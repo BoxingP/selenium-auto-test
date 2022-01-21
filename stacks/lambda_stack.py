@@ -9,7 +9,9 @@ class LambdaStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        s3_bucket_name = cdk.Fn.import_value('AutoTestS3BucketName')
+        s3_bucket_name = cdk.Fn.import_value(
+            construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'S3BucketName'
+        )
 
         publish_logs_to_cloudwatch = iam.ManagedPolicy(self, 'PublishLogsPolicy',
                                                        managed_policy_name='-'.join(
@@ -100,7 +102,7 @@ class LambdaStack(cdk.Stack):
         )
 
         test_website_lambda_function = _lambda.Function(
-            self, 'TestWebsite',
+            self, 'TestWebsiteLambda',
             code=_lambda.Code.from_asset(path="./lambda/test_website"),
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
@@ -109,11 +111,20 @@ class LambdaStack(cdk.Stack):
             },
             layers=[
                 _lambda.LayerVersion.from_layer_version_arn(
-                    self, 'PytestLayer', layer_version_arn=cdk.Fn.import_value('PytestLayerArn')),
+                    self, 'PytestLayer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'PytestLayerArn'
+                    )
+                ),
                 _lambda.LayerVersion.from_layer_version_arn(
-                    self, 'SeleniumLayer', layer_version_arn=cdk.Fn.import_value('SeleniumLayerArn')),
+                    self, 'SeleniumLayer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'SeleniumLayerArn'
+                    )
+                ),
                 _lambda.LayerVersion.from_layer_version_arn(
-                    self, 'ChromedriverLayer', layer_version_arn=cdk.Fn.import_value('ChromedriverLayerArn'))
+                    self, 'ChromedriverLayer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'ChromedriverLayerArn'
+                    )
+                )
             ],
             memory_size=4096,
             role=test_website_lambda_role,
@@ -122,7 +133,7 @@ class LambdaStack(cdk.Stack):
         test_website_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
         generate_report_lambda_function = _lambda.Function(
-            self, 'GenerateReport',
+            self, 'GenerateReportLambda',
             code=_lambda.Code.from_asset(path="./lambda/generate_report"),
             handler="generate_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
@@ -131,7 +142,10 @@ class LambdaStack(cdk.Stack):
             },
             layers=[
                 _lambda.LayerVersion.from_layer_version_arn(
-                    self, 'AllureLayer', layer_version_arn=cdk.Fn.import_value('AllureLayerArn'))
+                    self, 'AllureLayer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'AllureLayerArn'
+                    )
+                )
             ],
             memory_size=4096,
             role=generate_report_lambda_role,
@@ -139,7 +153,9 @@ class LambdaStack(cdk.Stack):
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
-        cdk.CfnOutput(self, 'OutputTestWebsiteLambdaArn', export_name='TestWebsiteLambdaArn',
+        cdk.CfnOutput(self, 'OutputTestWebsiteLambdaArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'TestWebsiteLambdaArn',
                       value=test_website_lambda_function.function_arn)
-        cdk.CfnOutput(self, 'OutputGenerateReportArn', export_name='GenerateReportArn',
+        cdk.CfnOutput(self, 'OutputGenerateReportLambdaArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'GenerateReportLambdaArn',
                       value=generate_report_lambda_function.function_arn)

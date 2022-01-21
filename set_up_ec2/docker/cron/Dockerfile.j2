@@ -17,6 +17,6 @@ RUN chmod +x cron.sh
 RUN mkdir -p /var/log/cron && touch /var/log/cron/cron.log
 
 ENV TZ="Asia/Shanghai"
-ENV S3_BUCKET=selenium-auto-test-qa-s3-s3
-ENV AWS_DEFAULT_REGION=cn-northwest-1
+ENV S3_BUCKET={{ s3_bucket_name }}
+ENV AWS_DEFAULT_REGION={{ vpc_region }}
 ENTRYPOINT ["/bin/sh", "/usr/src/app/cron.sh"]

@@ -6,16 +6,16 @@ from aws_cdk import (
     core as cdk
 )
 
-OFFICE_IP = ['222.126.242.202', '222.126.242.203']
-
 
 class EC2Stack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, vpc: ec2.Vpc, keypair_name: str, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct,
+                 construct_id: str, vpc: ec2.Vpc, ami: str, inbounds: list, keypair_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        s3_bucket_name = cdk.Fn.import_value('AutoTestS3BucketName')
+        s3_bucket_name = cdk.Fn.import_value(
+            construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'S3BucketName'
+        )
 
-        amazon_linux_image = ec2.MachineImage.generic_linux(
-            ami_map={os.getenv('AWS_DEFAULT_REGION'): 'ami-0f8d4b3ca40ae0bc6'})
+        amazon_linux_image = ec2.MachineImage.generic_linux(ami_map={os.getenv('AWS_DEFAULT_REGION'): ami})
         security_group = ec2.SecurityGroup(
             self, 'AllureSecurityGroup', vpc=vpc,
             description='Security group for allure server',
@@ -75,19 +75,30 @@ class EC2Stack(cdk.Stack):
             security_group=security_group,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
         )
-        for ip in OFFICE_IP:
-            security_group.add_ingress_rule(
-                peer=ec2.Peer.ipv4(ip + '/32'),
-                connection=ec2.Port(
-                    protocol=ec2.Protocol.TCP,
-                    string_representation="tcp on all ports",
-                    from_port=0,
-                    to_port=65535),
-                description='from office')
+        for inbound in inbounds:
+            for port in inbound['port']:
+                if '-' in str(port):
+                    [from_port, to_port] = str(port).split('-')
+                else:
+                    from_port = port
+                    to_port = port
+                security_group.add_ingress_rule(
+                    peer=ec2.Peer.ipv4(inbound['ip']),
+                    connection=ec2.Port(
+                        protocol=ec2.Protocol.TCP,
+                        string_representation=inbound['description'],
+                        from_port=int(from_port),
+                        to_port=int(to_port)
+                    ),
+                    description=inbound['description']
+                )
 
-        cdk.CfnOutput(self, 'OutputAllureInstanceId',
-                      export_name='AllureInstanceId', value=allure_instance.instance_id)
-        cdk.CfnOutput(self, 'OutputAllurePublicIP',
-                      export_name='AllureInstancePublicIP', value=allure_instance.instance_public_ip)
-        cdk.CfnOutput(self, 'OutputAllureInstanceKeypair',
-                      export_name='AllureInstanceKeypairName', value=keypair_name)
+        cdk.CfnOutput(self, 'OutputEc2InstanceId',
+                      export_name=construct_id.title().replace('-', '') + 'InstanceId',
+                      value=allure_instance.instance_id)
+        cdk.CfnOutput(self, 'OutputEc2InstancePublicIP',
+                      export_name=construct_id.title().replace('-', '') + 'InstancePublicIP',
+                      value=allure_instance.instance_public_ip)
+        cdk.CfnOutput(self, 'OutputEc2KeypairName',
+                      export_name=construct_id.title().replace('-', '') + 'KeypairName',
+                      value=keypair_name)

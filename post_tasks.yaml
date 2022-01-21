@@ -3,18 +3,24 @@
   command: cat /tmp/cdk_outputs.json
   register: cdk_outputs_content
 
-- name: read ec2 values from cdk outputs
+- name: read aws resource values from cdk outputs
   set_fact:
-    ec2_values: '{{ cdk_outputs_content.stdout | from_json | json_query(query) }}'
+    { "{{ item.resource + '_resource' }}": "{{ cdk_outputs_content.stdout | from_json | json_query(query) }}" }
   vars:
-    query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, "ec2" )) }}"'
+    query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, item.value )) }}"'
+  loop:
+    - { resource: 'ec2', value: 'ec2' }
+    - { resource: 's3', value: 's3' }
+    - { resource: 'vpc', value: 'vpc' }
 
 - name: extract value
   set_fact:
-    { "{{ item.name }}": "{{ ec2_values | json_query(item.value) }}" }
+    { "{{ item.name }}": "{{ vars[item.resource + '_resource'] | json_query(item.value) }}" }
   loop:
-    - { name: 'keypair_name', value: 'OutputAllureInstanceKeypair' }
-    - { name: 'ec2_public_ip', value: 'OutputAllurePublicIP' }
+    - { name: 'keypair_name', resource: 'ec2', value: 'OutputEc2KeypairName' }
+    - { name: 'ec2_public_ip', resource: 'ec2', value: 'OutputEc2InstancePublicIP' }
+    - { name: 's3_bucket_name', resource: 's3', value: 'OutputS3BucketName' }
+    - { name: 'vpc_region', resource: 'vpc', value: 'OutputVpcRegion' }
 
 - name: get play directory
   set_fact:
@@ -22,16 +28,22 @@
 
 - name: fetch template from remote
   fetch:
-    src: '{{ play_path }}/inventories/hosts.yaml.j2'
+    src: '{{ play_path }}/{{ item }}'
     dest: '/tmp/'
     flat: yes
     fail_on_missing: yes
+  loop:
+    - 'inventories/hosts.yaml.j2'
+    - 'docker/cron/Dockerfile.j2'
 
 - name: upload to remote
   template:
-    src: '/tmp/hosts.yaml.j2'
-    dest: '{{ play_path }}/inventories/hosts.yaml'
+    src: '/tmp/{{ item.file }}.j2'
+    dest: '{{ play_path }}/{{ item.path }}/{{ item.file }}'
     force: yes
+  loop:
+    - { file: 'hosts.yaml', path: 'inventories' }
+    - { file: 'Dockerfile', path: 'docker/cron' }
 
 - name: install epel-release
   yum:

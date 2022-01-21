@@ -5,14 +5,14 @@ from aws_cdk import (
 
 
 class S3BucketStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, is_versioned: bool, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, bucket_name: str, is_versioned: bool, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         s3_bucket = s3.Bucket(
             self, 'S3Bucket',
             auto_delete_objects=False,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            bucket_name='-'.join([construct_id, 's3']),
+            bucket_name=bucket_name,
             removal_policy=cdk.RemovalPolicy.DESTROY,
             versioned=is_versioned
         )
@@ -20,7 +20,8 @@ class S3BucketStack(cdk.Stack):
             s3_bucket, is_versioned, incomplete=7, is_transition=False, expiration=60
         )
 
-        cdk.CfnOutput(self, 'OutputAutoTestS3BucketName', export_name='AutoTestS3BucketName',
+        cdk.CfnOutput(self, 'OutputS3BucketName',
+                      export_name=construct_id.title().replace('-', '') + 'BucketName',
                       value=s3_bucket.bucket_name)
 
     @staticmethod
