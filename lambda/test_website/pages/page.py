@@ -1,4 +1,5 @@
 import allure
+from allure_commons.types import AttachmentType
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -42,22 +43,31 @@ class Page(object):
         self.find_element(*locator).click()
 
     def wait_element(self, *locator):
+        timeout = self.config['timeout']
         try:
-            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.presence_of_element_located(locator))
+            WebDriverWait(self.driver, timeout=timeout).until(EC.presence_of_element_located(locator))
         except TimeoutException:
-            print('\n * ELEMENT NOT FOUND WITHIN GIVEN TIME! --> %s' % (locator[1]))
+            print('\n * ELEMENT NOT FOUND WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
+            allure.attach(self.driver.get_screenshot_as_png(), name="%s not found" % (locator[1]),
+                          attachment_type=AttachmentType.PNG)
             self.driver.quit()
 
     def wait_element_to_be_clickable(self, *locator):
+        timeout = self.config['timeout']
         try:
-            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.element_to_be_clickable(locator))
+            WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable(locator))
         except TimeoutException:
-            print('\n * ELEMENT NOT CLICKABLE WITHIN GIVEN TIME! --> %s' % (locator[1]))
+            print('\n * ELEMENT NOT CLICKABLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
+            allure.attach(self.driver.get_screenshot_as_png(), name="%s not found" % (locator[1]),
+                          attachment_type=AttachmentType.PNG)
             self.driver.quit()
 
     def wait_element_to_be_visible(self, *locator):
+        timeout = self.config['timeout']
         try:
-            WebDriverWait(self.driver, timeout=self.config['timeout']).until(EC.visibility_of_element_located(locator))
+            WebDriverWait(self.driver, timeout=timeout).until(EC.visibility_of_element_located(locator))
         except TimeoutException:
-            print('\n * ELEMENT NOT VISIBLE WITHIN GIVEN TIME! --> %s' % (locator[1]))
+            print('\n * ELEMENT NOT VISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
+            allure.attach(self.driver.get_screenshot_as_png(), name="%s not found" % (locator[1]),
+                          attachment_type=AttachmentType.PNG)
             self.driver.quit()
