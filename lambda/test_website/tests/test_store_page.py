@@ -8,6 +8,7 @@ from utils.locators import StorePageLocators
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestStorePage:
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Add forgot item to cart test')
     @allure.description('This is test of add forgot item to cart')
     def test_forgot_item_added(self, config):
