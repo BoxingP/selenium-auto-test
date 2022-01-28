@@ -24,7 +24,6 @@ class TestStorePage:
     @allure.description('This is test of add product to cart')
     def test_product_added(self, config):
         store_page = StorePage(self.driver, config)
-        store_page.open('store/cart')
         store_page.add_product(catalog_number='26616', quantity='1')
         product_name = 'Prestained Protein Ladder, 10 to 180 kDa'
         assert product_name in store_page.find_element(*StorePageLocators.cart_item_name).text
