@@ -15,10 +15,9 @@ class TestProductPage:
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Add product to cart test')
     @allure.description('This is test of add product to cart')
-    def test_product_added(self, config):
+    def test_product_added(self, config, product):
         product_page = ProductPage(self.driver, config)
-        product_page.add_product(catalog_number='26616', quantity='1')
-        product_name = 'PageRuler™ 预染蛋白分子量标准，10 至 180 kDa'
+        product_page.add_product(catalog_number=product['sku'], quantity='1')
         try:
             WebDriverWait(self.driver, timeout=30).until(
                 EC.visibility_of_element_located(ProductPageLocators.added_product_msg)
@@ -30,4 +29,4 @@ class TestProductPage:
                           name="product added page not popped out", attachment_type=AttachmentType.PNG)
             product_page.open('store/cart')
         product_page.wait_element_to_be_visible(*CartPageLocators.order_summary_msg)
-        assert product_name in product_page.find_element(*CartPageLocators.cart_item_name).text
+        assert product['name'] in product_page.find_element(*CartPageLocators.cart_item_name).text
