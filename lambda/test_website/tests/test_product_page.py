@@ -18,7 +18,7 @@ class TestProductPage:
     def test_product_added(self, config):
         product_page = ProductPage(self.driver, config)
         product_page.add_product(catalog_number='26616', quantity='1')
-        product_name = 'Prestained Protein Ladder, 10 to 180 kDa'
+        product_name = 'PageRuler™ 预染蛋白分子量标准，10 至 180 kDa'
         try:
             WebDriverWait(self.driver, timeout=30).until(
                 EC.visibility_of_element_located(ProductPageLocators.added_product_msg)

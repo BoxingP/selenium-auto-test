@@ -15,6 +15,6 @@ class TestCartPage:
         cart_page = CartPage(self.driver, config)
         cart_page.open('store/cart')
         cart_page.add_forgot_item(catalog_number='26616', quantity='1')
-        product_name = 'Prestained Protein Ladder, 10 to 180 kDa'
+        product_name = 'PageRuler™ 预染蛋白分子量标准，10 至 180 kDa'
         cart_page.wait_element_to_be_visible(*CartPageLocators.add_success_msg)
         assert product_name in cart_page.find_element(*CartPageLocators.cart_item_name).text
