@@ -30,6 +30,16 @@ class CartPageLocators(object):
     add_success_msg = (By.XPATH, '//div[contains(@class, "line-item-success-msg")]//div[contains(@class, "tf-toast tf-toast-success")]')
     cart_item_name = (By.XPATH, '//div[@id="cartContent"]/form//div[@class="tf-row"]//div[contains(@class, "catalog-title")]')
     order_summary_msg = (By.XPATH, '//div[@id="orderSummary"]')
+    checkout_button = (By.XPATH, '//div[@id="mobileCheckoutButton"]/div/div/button')
+    ship_recipient = (By.ID, 'shipAttn')
+    bill_recipient = (By.ID, 'billAttn')
+    purchase_order_number = (By.XPATH, '//div[@id="checkoutContent"]//div[@class="purchase-order__selection"]/input')
+    continue_button = (By.XPATH, '//div[@id="orderSummary"]//button')
+    product_items_info = (By.XPATH, '//div[@id="orderSummary"]//table/tbody/tr/td[1]')
+    back_to_cart_button = (By.XPATH, '//div[@id="checkoutContent"]//div[contains(@class, "item-details")]/div/a')
+    empty_cart_button = (By.XPATH, '//div[@id="cartContent"]/form//a[contains(@class, "line-item-empty")]')
+    confirm_empty_cart_button = (By.XPATH, '//div[@id="empty-cart-modal"]//div/button[contains(@class, "primary-action")]')
+    cart_emptied_msg = (By.XPATH, '//div[@id="cartContent"]//div/div/span[contains(@class, "strong-alt")]')
 
 
 class ProductPageLocators(object):

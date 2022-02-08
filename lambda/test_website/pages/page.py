@@ -1,7 +1,8 @@
 import allure
 from allure_commons.types import AttachmentType
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -14,6 +15,14 @@ class Page(object):
     @allure.step('Finding {locator} on the page')
     def find_element(self, *locator):
         return self.driver.find_element(*locator)
+
+    @allure.step('Checking {locator} whether exists on the page')
+    def is_element_exists(self, *locator):
+        try:
+            self.driver.find_element(*locator)
+        except NoSuchElementException:
+            return False
+        return True
 
     def open(self, url=''):
         self.driver.get(self.config['tested_page'] + url)
@@ -33,8 +42,11 @@ class Page(object):
         hover.perform()
 
     @allure.step('Inputting text to {locator} on the page')
-    def input_text(self, text, *locator):
+    def input_text(self, text, *locator, is_overwrite=False):
         self.wait_element_to_be_clickable(*locator)
+        if is_overwrite:
+            self.find_element(*locator).send_keys(Keys.CONTROL + 'a')
+            self.find_element(*locator).send_keys(Keys.DELETE)
         self.find_element(*locator).send_keys(text)
 
     @allure.step('Clicking {locator} on the page')
