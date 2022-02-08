@@ -35,5 +35,5 @@ class CartPageLocators(object):
 class ProductPageLocators(object):
     product_quantity_field = (By.XPATH, '//div[@class="pdp-table"]//table/tbody/tr[@class="pdp-table__selected-sku"]/td[5]/input')
     add_product_to_cart_button = (By.XPATH, '//div[@class="pdp-actions"]//div[@class="pdp-actions__buttons"]/span/button')
-    added_product_msg = (By.XPATH, '//div[@id="cartletCartInfo"]//div[@class="cartlet-cart-items"]//div[contains(@class, "added-to-cart-header")]/span')
+    added_product_info = (By.XPATH, '//div[@id="cartletCartInfo"]//div[@class="cartlet-cart-items"]//div[contains(@class, "added-to-cart-item-info")]//a/span')
     view_cart_button = (By.XPATH, '//div[@id="cartletCartInfo"]//div[contains(@class, "cart-link-buttons") and not(contains(@class, "mobile"))]//a[@href="/store/cart"]')
