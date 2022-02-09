@@ -83,3 +83,13 @@ class Page(object):
             allure.attach(self.driver.get_screenshot_as_png(), name="%s not found" % (locator[1]),
                           attachment_type=AttachmentType.PNG)
             self.driver.quit()
+
+    def wait_text_to_be_display(self, text, *locator):
+        timeout = self.config['timeout']
+        try:
+            WebDriverWait(self.driver, timeout=timeout).until(EC.text_to_be_present_in_element(locator, text))
+        except TimeoutException:
+            print('\n * %s NOT DISPLAY WITHIN %s SECONDS! --> %s' % (text, timeout, locator[1]))
+            allure.attach(self.driver.get_screenshot_as_png(), name="%s not display" % text,
+                          attachment_type=AttachmentType.PNG)
+            self.driver.quit()

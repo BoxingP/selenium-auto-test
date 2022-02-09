@@ -27,7 +27,6 @@ class CartPageLocators(object):
     forgot_item_catalog_number_field = (By.XPATH, '//input[@name="sku" and contains(@class, "tf-input")]')
     forgot_item_quantity_field = (By.XPATH, '//input[@name="qty" and contains(@class, "tf-input")]')
     add_forgot_to_cart_button = (By.XPATH, '//button[@type="button" and contains(@class, "tf-button1")]')
-    add_success_msg = (By.XPATH, '//div[contains(@class, "line-item-success-msg")]//div[contains(@class, "tf-toast tf-toast-success")]')
     cart_item_name = (By.XPATH, '//div[@id="cartContent"]/form//div[@class="tf-row"]//div[contains(@class, "catalog-title")]')
     order_summary_msg = (By.XPATH, '//div[@id="orderSummary"]')
     checkout_button = (By.XPATH, '//div[@id="mobileCheckoutButton"]/div/div/button')
@@ -43,7 +42,7 @@ class CartPageLocators(object):
 
 
 class ProductPageLocators(object):
-    product_quantity_field = (By.XPATH, '//div[@class="pdp-table"]//table/tbody/tr[@class="pdp-table__selected-sku"]/td[5]/input')
-    add_product_to_cart_button = (By.XPATH, '//div[@class="pdp-actions"]//div[@class="pdp-actions__buttons"]/span/button')
+    product_quantity_field = (By.XPATH, '//div[@id="root"]//table/tbody/tr[1]//input[@alt="item-quantity"]')
+    add_product_to_cart_button = (By.XPATH, '(//div[@id="root"]//div/span/button)[3]')
     added_product_info = (By.XPATH, '//div[@id="cartletCartInfo"]//div[@class="cartlet-cart-items"]//div[contains(@class, "added-to-cart-item-info")]//a/span')
     view_cart_button = (By.XPATH, '//div[@id="cartletCartInfo"]//div[contains(@class, "cart-link-buttons") and not(contains(@class, "mobile"))]//a[@href="/store/cart"]')

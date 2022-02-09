@@ -12,5 +12,5 @@ class ProductPage(Page):
     @allure.step('Add product by catalog number: {catalog_number}')
     def add_product(self, catalog_number, quantity):
         self.open('order/catalog/product/{}'.format(catalog_number))
-        self.input_text(quantity, *self.locator.product_quantity_field)
+        self.input_text(quantity, *self.locator.product_quantity_field, is_overwrite=True)
         self.click(*self.locator.add_product_to_cart_button)

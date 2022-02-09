@@ -16,7 +16,7 @@ class TestCartPage:
         cart_page = CartPage(self.driver, config)
         cart_page.open('store/cart')
         cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
-        cart_page.wait_element_to_be_visible(*CartPageLocators.add_success_msg)
+        cart_page.wait_element_to_be_clickable(*CartPageLocators.empty_cart_button)
         assert product['name'] in cart_page.find_element(*CartPageLocators.cart_item_name).text
 
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
@@ -32,7 +32,7 @@ class TestCartPage:
         cart_page.empty_cart()
         cart_page.wait_element_to_be_visible(*CartPageLocators.cart_emptied_msg)
         cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
-        cart_page.wait_element_to_be_visible(*CartPageLocators.add_success_msg)
+        cart_page.wait_element_to_be_clickable(*CartPageLocators.empty_cart_button)
         cart_page.click(*CartPageLocators.checkout_button)
         cart_page.input_text('test', *CartPageLocators.ship_recipient)
         cart_page.input_text('test', *CartPageLocators.bill_recipient)
