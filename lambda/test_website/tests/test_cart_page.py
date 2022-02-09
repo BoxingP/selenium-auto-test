@@ -15,7 +15,7 @@ class TestCartPage:
     def test_forgot_item_added(self, config, product):
         cart_page = CartPage(self.driver, config)
         cart_page.open('store/cart')
-        cart_page.add_forgot_item(catalog_number=product['sku'], quantity='1')
+        cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
         cart_page.wait_element_to_be_visible(*CartPageLocators.add_success_msg)
         assert product['name'] in cart_page.find_element(*CartPageLocators.cart_item_name).text
 
@@ -31,7 +31,7 @@ class TestCartPage:
         cart_page.open('store/cart')
         cart_page.empty_cart()
         cart_page.wait_element_to_be_visible(*CartPageLocators.cart_emptied_msg)
-        cart_page.add_forgot_item(catalog_number=product['sku'], quantity='1')
+        cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
         cart_page.wait_element_to_be_visible(*CartPageLocators.add_success_msg)
         cart_page.click(*CartPageLocators.checkout_button)
         cart_page.input_text('test', *CartPageLocators.ship_recipient)
@@ -39,6 +39,6 @@ class TestCartPage:
         cart_page.input_text('NA', *CartPageLocators.purchase_order_number, is_overwrite=True)
         cart_page.click(*CartPageLocators.continue_button)
         cart_page.wait_element_to_be_visible(*CartPageLocators.order_summary_msg)
-        assert '1' in cart_page.find_element(*CartPageLocators.product_items_info).text
+        assert product['quantity'] in cart_page.find_element(*CartPageLocators.product_items_info).text
         cart_page.click(*CartPageLocators.back_to_cart_button)
         cart_page.empty_cart()

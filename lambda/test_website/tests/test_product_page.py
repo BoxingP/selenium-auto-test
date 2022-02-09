@@ -17,7 +17,7 @@ class TestProductPage:
     @allure.description('This is test of add product to cart')
     def test_product_added(self, config, product):
         product_page = ProductPage(self.driver, config)
-        product_page.add_product(catalog_number=product['sku'], quantity='1')
+        product_page.add_product(catalog_number=product['sku'], quantity=product['quantity'])
         try:
             WebDriverWait(self.driver, timeout=10).until(
                 EC.visibility_of_element_located(ProductPageLocators.added_product_info)
