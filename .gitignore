@@ -1,3 +1,4 @@
 .idea
 __pycache__
 .pytest_cache
+lambda/test_website/utils/users.json
