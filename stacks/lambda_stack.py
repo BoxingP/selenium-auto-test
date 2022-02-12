@@ -101,6 +101,16 @@ class LambdaStack(cdk.Stack):
             role_name='-'.join([construct_id, 'generate report role'.replace(' ', '-')]),
         )
 
+        parse_report_lambda_role = iam.Role(
+            self, 'ParseReportLambdaRole',
+            assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
+            description="IAM role for Lambda function",
+            managed_policies=[
+                publish_logs_to_cloudwatch
+            ],
+            role_name='-'.join([construct_id, 'parse report role'.replace(' ', '-')]),
+        )
+
         test_website_lambda_function = _lambda.Function(
             self, 'TestWebsiteLambda',
             code=_lambda.Code.from_asset(path="./lambda/test_website"),
@@ -153,9 +163,23 @@ class LambdaStack(cdk.Stack):
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
+        parse_report_lambda_function = _lambda.Function(
+            self, 'ParseReportLambda',
+            code=_lambda.Code.from_asset(path="./lambda/parse_report"),
+            handler="parse_report.lambda_handler",
+            runtime=_lambda.Runtime.PYTHON_3_6,
+            memory_size=4096,
+            role=parse_report_lambda_role,
+            timeout=cdk.Duration.seconds(900)
+        )
+        parse_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+
         cdk.CfnOutput(self, 'OutputTestWebsiteLambdaArn',
                       export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'TestWebsiteLambdaArn',
                       value=test_website_lambda_function.function_arn)
         cdk.CfnOutput(self, 'OutputGenerateReportLambdaArn',
                       export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'GenerateReportLambdaArn',
                       value=generate_report_lambda_function.function_arn)
+        cdk.CfnOutput(self, 'OutputParseReportLambdaArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'ParseReportLambdaArn',
+                      value=parse_report_lambda_function.function_arn)

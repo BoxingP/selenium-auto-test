@@ -23,7 +23,7 @@ class SchedulerStack(cdk.Stack):
             ),
             result_path='$',
             result_selector={
-                'number_of_failed_tests.$': '$.Payload'
+                'report.$': '$.Payload.report'
             },
             timeout=cdk.Duration.minutes(5)
         )
@@ -40,11 +40,18 @@ class SchedulerStack(cdk.Stack):
             timeout=cdk.Duration.minutes(5)
         )
 
-        create_message_job = sfn_tasks.EvaluateExpression(
-            self, "CreateMessage",
-            expression="`Tests failed number: ${$.number_of_failed_tests}\nPlease check the details in the report.`",
-            runtime=_lambda.Runtime.NODEJS_14_X,
-            result_path="$.message"
+        parse_report_job = sfn_tasks.LambdaInvoke(
+            self, 'ParseReport',
+            lambda_function=_lambda.Function.from_function_arn(
+                self, 'ParseReportLambda',
+                function_arn=cdk.Fn.import_value(
+                    construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'ParseReportLambdaArn'
+                )
+            ),
+            result_path='$',
+            result_selector={
+                'message.$': '$.Payload'
+            }
         )
 
         send_notification_job = sfn_tasks.SnsPublish(
@@ -62,9 +69,11 @@ class SchedulerStack(cdk.Stack):
 
         job_succeeded = sfn.Succeed(self, 'JobIsSucceeded')
 
-        is_sent_notification = sfn.Choice(self, 'DecideWhetherSendNotification')
-        is_sent_notification.when(sfn.Condition.number_greater_than('$.number_of_failed_tests', 0),
-                                  create_message_job.next(send_notification_job).next(job_succeeded))
+        is_sent_notification = sfn.Choice(self, 'DecideWhetherSendNotification', output_path='$.report.tests')
+        is_sent_notification.when(
+            sfn.Condition.number_less_than_json_path('$.report.summary.passed', '$.report.summary.num_tests'),
+            parse_report_job.next(send_notification_job).next(job_succeeded)
+        )
         is_sent_notification.otherwise(job_succeeded)
 
         definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification)

@@ -1,8 +1,6 @@
 import json
 import os
 import shutil
-import sys
-from io import StringIO
 
 import boto3
 import botocore
@@ -53,19 +51,16 @@ def empty_directory(directory='/tmp'):
 def lambda_handler(event, context):
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
     allure_results_dir = '/tmp/allure_results'
+    json_report_file = '/tmp/report.json'
 
-    original_output = sys.stdout
-    sys.stdout = StringIO()
-    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '-p', 'no:terminal'])
-    output = sys.stdout.getvalue()
-    number_of_failed = int(output.upper())
-    sys.stdout.close()
-    sys.stdout = original_output
+    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '--json=' + json_report_file])
     generate_env_properties(allure_results_dir)
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
+    with open(json_report_file, 'r', encoding='utf-8') as file:
+        report = json.loads(file.read())
     empty_directory()
 
-    return number_of_failed
+    return report
 
 
 if __name__ == '__main__':

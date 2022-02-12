@@ -6,6 +6,7 @@ import pytest
 from allure_commons.types import AttachmentType
 
 from utils.driver_factory import DriverFactory
+from utils.json_report import JSONReport
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.json')
 DEFAULT_WEBSITE = 'https://www.baidu.com/'
@@ -42,23 +43,13 @@ def setup(request, config):
     driver.quit()
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        '--json', action='store', dest='json_path', default=None, help='where to store the json report'
+    )
+
+
 @pytest.mark.tryfirst
 def pytest_configure(config):
-    config.pluginmanager.register(NumberOfFailed(), 'number_of_failed')
-
-
-class NumberOfFailed(object):
-    def __init__(self):
-        self.passed = 0
-        self.failed = 0
-
-    def pytest_runtest_logreport(self, report):
-        if report.when != 'call':
-            return
-        if report.passed:
-            self.passed += 1
-        elif report.failed:
-            self.failed += 1
-
-    def pytest_sessionfinish(self, session, exitstatus):
-        print(self.failed)
+    json_path = config.option.json_path
+    config.pluginmanager.register(JSONReport(json_path), name='json_report')
