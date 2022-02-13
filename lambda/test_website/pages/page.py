@@ -54,6 +54,14 @@ class Page(object):
         self.wait_element_to_be_clickable(*locator)
         self.find_element(*locator).click()
 
+    @allure.step('Checking {locator} whether clickable on the page')
+    def is_element_clickable(self, *locator):
+        cursor = self.find_element(*locator).value_of_css_property("cursor")
+        if cursor == "pointer":
+            return True
+        else:
+            return False
+
     def wait_element(self, *locator):
         timeout = self.config['timeout']
         try:

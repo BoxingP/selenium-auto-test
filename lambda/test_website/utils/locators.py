@@ -11,6 +11,12 @@ class MainPageLocators(object):
     sign_in_link = (By.ID, 'signIn')
     user_profile_menu = (By.ID, 'hfUserProfileLink')
     sign_out_link = (By.ID, 'hfB2cCmgtSignOutLink')
+    quick_order_link = (By.XPATH, '//div[contains(@class, "homeiconone")]/div[@class="iconone3"]/p/b/a')
+    promotion_bar = (By.XPATH, '//div[@id="promoBarContent"]/a')
+    search_product_field = (By.ID, 'suggest1')
+    search_product_button = (By.ID, 'searchButton')
+    search_product_result = (By.XPATH, '//div[@id="mainContent"]//div[@class="utility-bar-content"]/span')
+    search_matched_product = (By.XPATH, '//div[@id="mainContent"]//h2/a[@data-res_pos="1"]')
 
 
 class LoginPageLocators(object):
