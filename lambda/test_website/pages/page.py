@@ -62,6 +62,14 @@ class Page(object):
         else:
             return False
 
+    @allure.step('Scrolling page {direction}')
+    def scroll_page(self, direction):
+        html = self.driver.find_element_by_tag_name('html')
+        if direction == 'up':
+            html.send_keys(Keys.CONTROL + Keys.HOME)
+        elif direction == 'down':
+            html.send_keys(Keys.END)
+
     def wait_element(self, *locator):
         timeout = self.config['timeout']
         try:
