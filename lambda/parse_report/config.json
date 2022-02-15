@@ -1,0 +1,4 @@
+{
+  "url": "",
+  "alarm_template": "{\"targetName\": \"${target_name}\", \"message\": \"${message}\"}"
+}
