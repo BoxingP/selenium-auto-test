@@ -21,7 +21,9 @@ def get_failed_tests(json_data):
         name = '::'.join(test['name'].split("::")[-2:])
         stage_outcome = []
         stage_detail = []
-        for stage in [test['setup'], test['call'], test['teardown']]:
+        for key in ('name', 'duration', 'run_index', 'outcome'):
+            test.pop(key, None)
+        for stage in test.values():
             if stage['outcome'] == 'passed':
                 continue
             stage_outcome.append('%s %s' % (stage['name'], stage['outcome']))
