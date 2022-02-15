@@ -136,7 +136,7 @@ class LambdaStack(cdk.Stack):
                     )
                 )
             ],
-            memory_size=4096,
+            memory_size=5120,
             role=test_website_lambda_role,
             timeout=cdk.Duration.seconds(900)
         )

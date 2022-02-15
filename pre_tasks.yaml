@@ -5,6 +5,7 @@
       - allure-pytest==2.9.45
       - pytest==6.2.5
       - pytest-rerunfailures==10.2
+      - pytest-xdist==2.5.0
     virtualenv: /tmp/pytest/python
     virtualenv_command: /usr/bin/python3 -m venv
   become: yes
