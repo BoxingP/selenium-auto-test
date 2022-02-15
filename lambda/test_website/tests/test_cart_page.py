@@ -10,9 +10,9 @@ from utils.locators import CartPageLocators, MainPageLocators
 class TestCartPage:
 
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
-    @allure.title('Add forgot item to cart test')
-    @allure.description('This is test of add forgot item to cart')
-    def test_forgot_item_added(self, config, product):
+    @allure.title('Add forgotten product to cart test')
+    @allure.description('This is test of add forgotten product to cart')
+    def test_forgotten_product_added_to_cart(self, config, product):
         cart_page = CartPage(self.driver, config)
         cart_page.open('store/cart')
         cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
@@ -22,7 +22,7 @@ class TestCartPage:
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Checkout order test')
     @allure.description('This is test of checkout order')
-    def test_checkout(self, config, product):
+    def test_checkout_order(self, config, product):
         login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
         login_page.login('boxing')

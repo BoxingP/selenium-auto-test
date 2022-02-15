@@ -10,7 +10,7 @@ class TestLoginPage:
 
     @allure.title('Login with invalid user test')
     @allure.description('This is test of login with invalid user')
-    def test_login_failed(self, config):
+    def test_login_with_invalid_user(self, config):
         login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
         login_page.login('test')
@@ -20,7 +20,7 @@ class TestLoginPage:
 
     @allure.title('Login with valid user test')
     @allure.description('This is test of login with valid user')
-    def test_login_passed(self, config):
+    def test_login_with_valid_user(self, config):
         login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
         login_page.login('boxing')
