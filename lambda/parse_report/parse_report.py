@@ -53,14 +53,40 @@ def send_alarm_info(failed_tests):
         config = json.load(file)
     url = config['url']
     alarm_template = Template(config['alarm_template'])
+    response = []
     for test in failed_tests:
         alarm = json.loads(alarm_template.substitute(target_name=test['name'], message=test['reason']))
         params = json.dumps(alarm).encode('utf8')
         req = urllib.request.Request(url, data=params, headers={'content-type': 'application/json'})
-        response = urllib.request.urlopen(req)
+        resource = urllib.request.urlopen(req)
+        content = resource.read().decode(resource.headers.get_content_charset())
+        response.append(content)
+    return '\n'.join(response)
 
 
 def lambda_handler(event, context):
     failed_tests = get_failed_tests(event)
-    send_alarm_info(failed_tests)
-    return generate_notification_msg(failed_tests)
+    response = ''
+    send_alarm_error_msg = ''
+    message = ''
+    generate_message_error_msg = ''
+    try:
+        response = send_alarm_info(failed_tests)
+    except Exception as error:
+        send_alarm_error_msg = repr(error)
+    try:
+        message = generate_notification_msg(failed_tests)
+    except Exception as error:
+        generate_message_error_msg = repr(error)
+
+    result = {
+        'alarm': {
+            'response': response,
+            'exception': send_alarm_error_msg
+        },
+        'notification': {
+            'message': message,
+            'exception': generate_message_error_msg
+        }
+    }
+    return result

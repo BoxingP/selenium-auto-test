@@ -50,7 +50,8 @@ class SchedulerStack(cdk.Stack):
             ),
             result_path='$',
             result_selector={
-                'message.$': '$.Payload'
+                'alarm.$': '$.Payload.alarm',
+                'notification.$': '$.Payload.notification'
             }
         )
 
@@ -64,7 +65,8 @@ class SchedulerStack(cdk.Stack):
             ),
             message=sfn.TaskInput.from_json_path_at("$.message"),
             subject='There Are Failed Tests Occurred on the Website',
-            result_path="$.sns"
+            input_path='$.notification',
+            result_path='$'
         )
 
         job_succeeded = sfn.Succeed(self, 'JobIsSucceeded')
