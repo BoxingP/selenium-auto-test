@@ -1,4 +1,5 @@
 from aws_cdk import (
+    aws_ec2 as ec2,
     aws_iam as iam,
     aws_lambda as _lambda,
     core as cdk
@@ -6,7 +7,7 @@ from aws_cdk import (
 
 
 class LambdaStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, vpc: ec2.Vpc, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         s3_bucket_name = cdk.Fn.import_value(
@@ -106,7 +107,8 @@ class LambdaStack(cdk.Stack):
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
             description="IAM role for Lambda function",
             managed_policies=[
-                publish_logs_to_cloudwatch
+                publish_logs_to_cloudwatch,
+                iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaVPCAccessExecutionRole')
             ],
             role_name='-'.join([construct_id, 'parse report role'.replace(' ', '-')]),
         )
@@ -163,6 +165,16 @@ class LambdaStack(cdk.Stack):
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
+        parse_report_sg = ec2.SecurityGroup(
+            self, 'ParseReportLambdaSecurityGroup', vpc=vpc,
+            description='Security group for parse report lambda',
+            security_group_name='-'.join([construct_id, 'parse report sg'.replace(' ', '-')])
+        )
+        parse_report_sg.add_egress_rule(
+            peer=ec2.Peer.ipv4('0.0.0.0/0'),
+            connection=ec2.Port.all_traffic(),
+            description='internet'
+        )
         parse_report_lambda_function = _lambda.Function(
             self, 'ParseReportLambda',
             code=_lambda.Code.from_asset(path="./lambda/parse_report"),
@@ -170,7 +182,10 @@ class LambdaStack(cdk.Stack):
             runtime=_lambda.Runtime.PYTHON_3_6,
             memory_size=4096,
             role=parse_report_lambda_role,
-            timeout=cdk.Duration.seconds(900)
+            security_groups=[parse_report_sg],
+            timeout=cdk.Duration.seconds(900),
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnets=vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE).subnets)
         )
         parse_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 

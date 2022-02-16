@@ -34,10 +34,10 @@ s3_bucket_stack = S3BucketStack(
     app, '-'.join([project, environment, 's3']),
     bucket_name='-'.join([project, environment, 's3']), is_versioned=is_versioned, env=aws_environment
 )
-lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
-lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), env=aws_environment)
-scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), env=aws_environment)
 vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
+lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
+lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), vpc=vpc_stack.vpc, env=aws_environment)
+scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), env=aws_environment)
 date_now = datetime.datetime.now().strftime("%Y%m%d")
 ec2_stack = EC2Stack(
     app, '-'.join([project, environment, 'ec2']),
