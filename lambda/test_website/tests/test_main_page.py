@@ -8,6 +8,7 @@ from utils.locators import MainPageLocators, LoginPageLocators
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestMainPage:
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Open login page test')
     @allure.description('This is test of open login page on main page')
     def test_login_page_opened(self, config):
@@ -50,6 +51,7 @@ class TestMainPage:
         assert main_page.is_element_exists(*MainPageLocators.thin_banner) \
                and main_page.is_element_clickable(*MainPageLocators.thin_banner)
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Check landscape banner exists test')
     @allure.description('This is test of check landscape banner exists on main page')
     def test_landscape_banner_exists(self, config):
@@ -64,6 +66,7 @@ class TestMainPage:
         assert main_page.is_element_exists(*MainPageLocators.landscape_banner) \
                and main_page.is_element_clickable(*MainPageLocators.landscape_banner)
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Check order index exists test')
     @allure.description('This is test of check order index exists on main page')
     def test_order_index_exists(self, config):

@@ -8,6 +8,7 @@ from utils.locators import LoginPageLocators, MainPageLocators
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestLoginPage:
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Login with invalid user test')
     @allure.description('This is test of login with invalid user')
     def test_login_with_invalid_user(self, config):
@@ -20,6 +21,7 @@ class TestLoginPage:
         login_page.wait_element(*LoginPageLocators.login_error)
         assert error_msg in login_page.find_element(*LoginPageLocators.login_error_message).text
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Login with valid user test')
     @allure.description('This is test of login with valid user')
     def test_login_with_valid_user(self, config):
