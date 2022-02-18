@@ -13,4 +13,3 @@ class MainPage(Page):
     def go_to_login_page(self):
         self.hover(*self.locator.my_account_menu)
         self.click(*self.locator.sign_in_link)
-        self.wait_element(*self.locator.logo_image)

@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from pages.main_page import MainPage
-from utils.locators import MainPageLocators
+from utils.locators import MainPageLocators, LoginPageLocators
 
 
 @pytest.mark.usefixtures('setup', 'website_setup')
@@ -14,8 +14,10 @@ class TestMainPage:
         main_page = MainPage(self.driver, config)
         main_page.open()
         main_page.go_to_login_page()
-        link_clip = 'account-center/signin-identifie'
-        assert link_clip in main_page.get_url()
+        main_page.wait_url_changed_to('proxy.html')
+        main_page.wait_url_changed_to('signin-identifier.html')
+        login_title = '登录您的账户'
+        assert login_title in main_page.find_element(*LoginPageLocators.login_title).text
 
     @allure.title('Open quick order page test')
     @allure.description('This is test of open quick order page on main page')

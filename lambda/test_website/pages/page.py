@@ -109,3 +109,12 @@ class Page(object):
             allure.attach(self.driver.get_screenshot_as_png(), name="%s not display" % text,
                           attachment_type=AttachmentType.PNG)
             self.driver.quit()
+
+    def wait_url_changed_to(self, url):
+        timeout = self.config['timeout']
+        try:
+            WebDriverWait(self.driver, timeout=timeout).until(EC.url_contains(url))
+        except TimeoutException:
+            print('\n URL NOT CHANGED TO %s WITHIN %s SECONDS! --> CURRENT URL IS %s' % (url, timeout, self.get_url()))
+            allure.attach(self.driver.get_screenshot_as_png(), name="url not changed",
+                          attachment_type=AttachmentType.PNG)

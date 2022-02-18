@@ -26,6 +26,8 @@ class TestCartPage:
         login_page = LoginPage(self.driver, config)
         login_page.open('account-center/signin-identifier.html')
         login_page.login('boxing')
+        login_page.wait_url_changed_to('proxy.html')
+        login_page.wait_url_changed_to('home.html')
         login_page.wait_element(*MainPageLocators.user_profile_menu)
         cart_page = CartPage(self.driver, config)
         cart_page.open('store/cart')

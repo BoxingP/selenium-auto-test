@@ -24,7 +24,7 @@ class MainPageLocators(object):
 
 
 class LoginPageLocators(object):
-    login_field = (By.ID, 'Thermofisher-two-step-login-username')
+    login_title = (By.XPATH, '//body[@id="login-app-body"]/div/div/div/div/p')
     username_field = (By.ID, 'username-field')
     next_button = (By.ID, 'next-button')
     password_field = (By.ID, 'password-field')
