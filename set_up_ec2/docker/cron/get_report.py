@@ -28,7 +28,9 @@ def download_files_from_s3(local_path, s3_bucket=os.environ['S3_BUCKET'], s3_dir
                 if not os.path.exists(absolute_path):
                     os.makedirs(absolute_path)
                 file_name = os.path.join(absolute_path, key.split('/')[-1])
-                if last_modified > time_point:
+                if os.path.isfile(file_name) and last_modified < time_point:
+                    pass
+                else:
                     client.download_file(Bucket=s3_bucket, Key=key, Filename=file_name)
 
 
@@ -37,7 +39,7 @@ def get_report():
     local_path = os.path.join(os.path.abspath(os.sep), 'var', report_path)
     days = None
     if os.path.exists(local_path):
-        days = 1
+        days = 0.1
     download_files_from_s3(local_path, s3_directory=os.path.join(report_path, '').replace('\\', '/'), within_days=days)
 
 
