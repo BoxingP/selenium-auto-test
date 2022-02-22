@@ -1,3 +1,5 @@
+import os
+
 from aws_cdk import (
     aws_ec2 as ec2,
     aws_iam as iam,
@@ -115,7 +117,7 @@ class LambdaStack(cdk.Stack):
 
         test_website_lambda_function = _lambda.Function(
             self, 'TestWebsiteLambda',
-            code=_lambda.Code.from_asset(path="./lambda/test_website"),
+            code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'test_website')),
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={
@@ -146,7 +148,7 @@ class LambdaStack(cdk.Stack):
 
         generate_report_lambda_function = _lambda.Function(
             self, 'GenerateReportLambda',
-            code=_lambda.Code.from_asset(path="./lambda/generate_report"),
+            code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'generate_report')),
             handler="generate_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             environment={
@@ -177,7 +179,7 @@ class LambdaStack(cdk.Stack):
         )
         parse_report_lambda_function = _lambda.Function(
             self, 'ParseReportLambda',
-            code=_lambda.Code.from_asset(path="./lambda/parse_report"),
+            code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'parse_report')),
             handler="parse_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             memory_size=4096,

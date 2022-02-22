@@ -22,7 +22,7 @@ class Keypair(object):
                     KeyName=keypair_name, KeyType='rsa',
                     TagSpecifications=[{'ResourceType': 'key-pair', 'Tags': aws_tags}]
                 )
-                keypair_path = '/tmp/' + keypair_name + '.pem'
+                keypair_path = os.path.join(os.path.abspath(os.sep), 'tmp', keypair_name + '.pem')
                 with open(keypair_path, 'w') as file:
                     file.write(keypair.key_material)
                 os.chmod(keypair_path, 0o600)

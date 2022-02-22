@@ -33,12 +33,12 @@ def download_files_from_s3(local_path, s3_bucket=os.environ['S3_BUCKET'], s3_dir
 
 
 def get_report():
-    local_path = '/var/allure_reports'
-    report_path = 'allure_reports/'
+    report_path = 'allure_reports'
+    local_path = os.path.join(os.path.abspath(os.sep), 'var', report_path)
     days = None
     if os.path.exists(local_path):
         days = 1
-    download_files_from_s3(local_path, s3_directory=report_path, within_days=days)
+    download_files_from_s3(local_path, s3_directory=os.path.join(report_path, '').replace('\\', '/'), within_days=days)
 
 
 if __name__ == '__main__':

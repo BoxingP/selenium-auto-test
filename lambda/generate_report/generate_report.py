@@ -30,7 +30,7 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
         for file in files:
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, local_directory)
-            s3_path = os.path.join(s3_directory, relative_path)
+            s3_path = os.path.join(s3_directory, relative_path).replace('\\', '/')
 
             print('Uploading %s ...' % s3_path)
             client.upload_file(file_path, s3_bucket, s3_path)
@@ -56,7 +56,7 @@ def empty_s3_directory(s3_directory, s3_bucket=os.environ['s3_bucket_name']):
                 client.delete_object(Bucket=s3_bucket, Key=key)
 
 
-def empty_directory(directory='/tmp'):
+def empty_directory(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         try:
@@ -69,23 +69,23 @@ def empty_directory(directory='/tmp'):
 
 
 def lambda_handler(event, context):
-    local_path = '/tmp'
-    result_path = 'allure_results/'
-    report_path = 'allure_reports/'
+    local_path = os.path.join(os.path.abspath(os.sep), 'tmp')
+    result_path = 'allure_results'
+    report_path = 'allure_reports'
     local_results_path = os.path.join(local_path, result_path)
     local_reports_path = os.path.join(local_path, report_path)
 
     if os.path.exists(local_results_path):
         shutil.rmtree(local_results_path)
-    download_files_from_s3(local_path, s3_directory=result_path)
+    download_files_from_s3(local_path, s3_directory=os.path.join(result_path, '').replace('\\', '/'))
     if not os.path.exists(local_results_path):
         return
-    download_files_from_s3(local_path, s3_directory=report_path + 'history/')
-    local_history_path = os.path.join(local_path, report_path, 'history/')
-    move_files_from_directory_to_another(local_history_path, os.path.join(local_results_path, 'history/'))
+    download_files_from_s3(local_path, s3_directory=os.path.join(report_path, 'history', '').replace('\\', '/'))
+    local_history_path = os.path.join(local_path, report_path, 'history')
+    move_files_from_directory_to_another(local_history_path, os.path.join(local_results_path, 'history'))
     subprocess.run(['/opt/allure-2.16.1/bin/allure', 'generate', '-c', local_results_path, '-o', local_reports_path])
     upload_files_to_s3(local_reports_path, s3_directory=report_path)
-    empty_s3_directory(result_path)
+    empty_s3_directory(os.path.join(result_path, '').replace('\\', '/'))
     empty_directory(local_path)
 
 

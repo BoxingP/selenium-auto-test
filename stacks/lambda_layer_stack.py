@@ -1,3 +1,5 @@
+import os
+
 from aws_cdk import (
     aws_lambda as _lambda,
     core as cdk
@@ -10,7 +12,7 @@ class LambdaLayerStack(cdk.Stack):
 
         pytest_layer = _lambda.LayerVersion(
             self, 'PytestLayer',
-            code=_lambda.Code.from_asset('/tmp/pytest'),
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'pytest')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_6
@@ -20,7 +22,7 @@ class LambdaLayerStack(cdk.Stack):
 
         selenium_layer = _lambda.LayerVersion(
             self, 'SeleniumLayer',
-            code=_lambda.Code.from_asset('/tmp/selenium'),
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'selenium')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_6
@@ -30,7 +32,7 @@ class LambdaLayerStack(cdk.Stack):
 
         chromedriver_layer = _lambda.LayerVersion(
             self, 'ChromedriverLayer',
-            code=_lambda.Code.from_asset('/tmp/chromedriver'),
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'chromedriver')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_6
@@ -40,7 +42,7 @@ class LambdaLayerStack(cdk.Stack):
 
         allure_layer = _lambda.LayerVersion(
             self, 'AllureLayer',
-            code=_lambda.Code.from_asset('/tmp/allure'),
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'allure')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
                 _lambda.Runtime.PYTHON_3_6

@@ -13,7 +13,7 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
         for file in files:
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, local_directory)
-            s3_path = os.path.join(s3_directory, relative_path)
+            s3_path = os.path.join(s3_directory, relative_path).replace('\\', '/')
 
             print('Searching "%s" in "%s"' % (s3_path, s3_bucket))
             try:
@@ -36,7 +36,7 @@ def generate_env_properties(target_path, config_path=os.path.join(os.path.dirnam
         file.writelines([line1, line2, line3, line4, line5])
 
 
-def empty_directory(directory='/tmp'):
+def empty_directory(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         try:
@@ -50,15 +50,16 @@ def empty_directory(directory='/tmp'):
 
 def lambda_handler(event, context):
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
-    allure_results_dir = '/tmp/allure_results'
-    json_report_file = '/tmp/report.json'
+    tmp_dir = os.path.join(os.path.abspath(os.sep), 'tmp')
+    allure_results_dir = os.path.join(tmp_dir, 'allure_results')
+    json_report_file = os.path.join(tmp_dir, 'report.json')
 
     pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '--json=' + json_report_file, '-n', '3'])
     generate_env_properties(allure_results_dir)
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
     with open(json_report_file, 'r', encoding='utf-8') as file:
         report = json.loads(file.read())
-    empty_directory()
+    empty_directory(directory=tmp_dir)
 
     return report
 
