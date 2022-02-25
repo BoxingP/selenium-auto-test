@@ -80,15 +80,17 @@ class SchedulerStack(cdk.Stack):
 
         definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification)
 
+        job_machine_name = '-'.join([construct_id, 'state machine'.replace(' ', '-')])
         job_machine = sfn.StateMachine(self, 'JobMachine',
                                        definition=definition,
-                                       state_machine_name='-'.join([construct_id, 'state machine'.replace(' ', '-')]),
+                                       state_machine_name=job_machine_name,
                                        timeout=cdk.Duration.minutes(20))
 
+        scheduler_event_name = '-'.join([construct_id, 'rule'.replace(' ', '-')])
         scheduler_event = events.Rule(
             self, "ScheduleRule",
             description='To trigger the testing for website',
-            rule_name='-'.join([construct_id, 'rule'.replace(' ', '-')]),
+            rule_name=scheduler_event_name,
             schedule=events.Schedule.expression('cron(*/10 * * * ? *)'),
             targets=[
                 targets.SfnStateMachine(
@@ -96,3 +98,5 @@ class SchedulerStack(cdk.Stack):
                 )
             ]
         )
+
+        cdk.Tags.of(job_machine).add('Name', job_machine_name.lower(), priority=50)

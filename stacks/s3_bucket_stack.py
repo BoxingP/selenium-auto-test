@@ -20,6 +20,8 @@ class S3BucketStack(cdk.Stack):
             s3_bucket, is_versioned, incomplete=7, is_transition=False, expiration=60
         )
 
+        cdk.Tags.of(s3_bucket).add('Name', bucket_name.lower(), priority=50)
+
         cdk.CfnOutput(self, 'OutputS3BucketName',
                       export_name=construct_id.title().replace('-', '') + 'BucketName',
                       value=s3_bucket.bucket_name)

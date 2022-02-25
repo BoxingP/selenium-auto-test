@@ -11,16 +11,18 @@ aws_ec2_inbounds:
     description: 'from Shanghai office'
 aws_s3_versioned: False
 aws_tags:
-  app role: 'Digital Solutions China Operations'
-  application owner: '{{ email_address }}'
-  application:
+  Name:
+  app role:
+  application owner: '{{ owner }}'
+  application: 'monitoring for thermofisher.cn'
   businessunit:
   costcenter:
-  division: 'DSC'
+  data classification: 'internal use'
+  division:
   environment: '{{ deploy_environment }}'
-  project: '{{ project | title }}'
+  project: '{{ project | lower }}'
+  snow support: 'cn.corp.mst.digital operations'
 aws_vpc_cidr: '10.5.0.0/16'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
-subscribers:
-  - '{{ email_address }}'
+subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]

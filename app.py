@@ -55,12 +55,11 @@ lambda_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(vpc_stack)
 for key, value in config['aws_tags'].items():
-    cdk.Tags.of(app).add(key, value or " ")
-cdk.Tags.of(s3_bucket_stack).add("application", "S3")
-cdk.Tags.of(lambda_layer_stack).add("application", "LambdaLayer")
-cdk.Tags.of(lambda_stack).add("application", "Lambda")
-cdk.Tags.of(scheduler_stack).add("application", "Scheduler")
-cdk.Tags.of(vpc_stack).add("application", "VPC")
-cdk.Tags.of(ec2_stack).add("application", "EC2")
-cdk.Tags.of(sns_stack).add("application", "SNS")
+    cdk.Tags.of(app).add(key, value or " ", priority=1)
+stacks = [s3_bucket_stack, vpc_stack, lambda_layer_stack, lambda_stack, scheduler_stack, ec2_stack, sns_stack]
+for stack in stacks:
+    stack_type = type(stack)
+    stack_name = stack_type.__name__.partition('Stack')[0]
+    cdk.Tags.of(stack).add('Name', '-'.join([stack_name, 'stack', 'for', project]).lower(), priority=2)
+    cdk.Tags.of(stack).add('app role', stack_name.lower(), priority=2)
 app.synth()

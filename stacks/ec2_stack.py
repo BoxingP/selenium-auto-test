@@ -16,16 +16,16 @@ class EC2Stack(cdk.Stack):
         )
 
         amazon_linux_image = ec2.MachineImage.generic_linux(ami_map={os.getenv('AWS_DEFAULT_REGION'): ami})
+        security_group_name = '-'.join([construct_id, 'allure sg'.replace(' ', '-')])
         security_group = ec2.SecurityGroup(
             self, 'AllureSecurityGroup', vpc=vpc,
             description='Security group for allure server',
-            security_group_name='-'.join([construct_id, 'allure sg'.replace(' ', '-')])
+            security_group_name=security_group_name
         )
+        reading_s3_policy_name = '-'.join([construct_id, 'reading s3 policy'.replace(' ', '-')])
         reading_s3_policy = iam.ManagedPolicy(
             self, 'ReadingS3Policy',
-            managed_policy_name='-'.join(
-                [construct_id, 'reading s3 policy'.replace(' ', '-')]
-            ),
+            managed_policy_name=reading_s3_policy_name,
             description='Policy to read S3 bucket',
             statements=[
                 iam.PolicyStatement(
@@ -46,12 +46,13 @@ class EC2Stack(cdk.Stack):
                 )
             ]
         )
+        allure_role_name = '-'.join([construct_id, 'allure server role'.replace(' ', '-')])
         allure_role = iam.Role(
             self, 'AllureRole',
             assumed_by=iam.ServicePrincipal('ec2.amazonaws.com.cn'),
             description="IAM role for allure server",
             managed_policies=[reading_s3_policy],
-            role_name='-'.join([construct_id, 'allure server role'.replace(' ', '-')]),
+            role_name=allure_role_name
         )
         allure_instance = ec2.Instance(
             self, 'AllureEC2',
@@ -92,6 +93,9 @@ class EC2Stack(cdk.Stack):
                     ),
                     description=inbound['description']
                 )
+
+        cdk.Tags.of(security_group).add('Name', security_group_name.lower(), priority=50)
+        cdk.Tags.of(allure_role).add('Name', allure_role_name.lower(), priority=50)
 
         cdk.CfnOutput(self, 'OutputEc2InstanceId',
                       export_name=construct_id.title().replace('-', '') + 'InstanceId',
