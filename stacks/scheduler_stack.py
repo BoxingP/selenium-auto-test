@@ -1,5 +1,6 @@
 from aws_cdk import (
     aws_events as events,
+    aws_iam as iam,
     aws_events_targets as targets,
     aws_lambda as _lambda,
     aws_sns as sns,
@@ -80,12 +81,29 @@ class SchedulerStack(cdk.Stack):
 
         definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification)
 
+        job_machine_role_name = '-'.join([construct_id, 'state machine role'.replace(' ', '-')])
+        job_machine_role = iam.Role(
+            self, 'JobMachineRole',
+            assumed_by=iam.ServicePrincipal('states.amazonaws.com'),
+            description='IAM role for job machine',
+            managed_policies=[],
+            role_name=job_machine_role_name,
+        )
         job_machine_name = '-'.join([construct_id, 'state machine'.replace(' ', '-')])
         job_machine = sfn.StateMachine(self, 'JobMachine',
                                        definition=definition,
+                                       role=job_machine_role,
                                        state_machine_name=job_machine_name,
                                        timeout=cdk.Duration.minutes(20))
 
+        event_rule_role_name = '-'.join([construct_id, 'event rule role'.replace(' ', '-')])
+        event_rule_role = iam.Role(
+            self, 'EventRuleRole',
+            assumed_by=iam.ServicePrincipal('events.amazonaws.com'),
+            description='IAM role for event rule',
+            managed_policies=[],
+            role_name=event_rule_role_name,
+        )
         scheduler_event_name = '-'.join([construct_id, 'rule'.replace(' ', '-')])
         scheduler_event = events.Rule(
             self, "ScheduleRule",
@@ -94,9 +112,11 @@ class SchedulerStack(cdk.Stack):
             schedule=events.Schedule.expression('cron(*/10 * * * ? *)'),
             targets=[
                 targets.SfnStateMachine(
-                    job_machine
+                    job_machine, role=event_rule_role
                 )
             ]
         )
 
+        cdk.Tags.of(job_machine_role).add('Name', job_machine_role_name.lower(), priority=50)
         cdk.Tags.of(job_machine).add('Name', job_machine_name.lower(), priority=50)
+        cdk.Tags.of(event_rule_role).add('Name', event_rule_role_name.lower(), priority=50)
