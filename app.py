@@ -9,7 +9,7 @@ from stacks.ec2_stack import EC2Stack
 from stacks.lambda_layer_stack import LambdaLayerStack
 from stacks.lambda_stack import LambdaStack
 from stacks.s3_bucket_stack import S3BucketStack
-from stacks.scheduler_stack import SchedulerStack
+from stacks.step_functions_stack import StepFunctionsStack
 from stacks.sns_stack import SNSStack
 from stacks.vpc_stack import VPCStack
 from utils.keypair import Keypair
@@ -37,7 +37,7 @@ s3_bucket_stack = S3BucketStack(
 vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
 lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
 lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), vpc=vpc_stack.vpc, env=aws_environment)
-scheduler_stack = SchedulerStack(app, '-'.join([project, environment, 'scheduler']), env=aws_environment)
+step_functions_stack = StepFunctionsStack(app, '-'.join([project, environment, 'stepfunctions']), env=aws_environment)
 date_now = datetime.datetime.now().strftime("%Y%m%d")
 ec2_stack = EC2Stack(
     app, '-'.join([project, environment, 'ec2']),
@@ -48,15 +48,15 @@ ec2_stack = EC2Stack(
     env=aws_environment
 )
 sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), subscribers, env=aws_environment)
-scheduler_stack.add_dependency(lambda_stack)
-scheduler_stack.add_dependency(sns_stack)
+step_functions_stack.add_dependency(lambda_stack)
+step_functions_stack.add_dependency(sns_stack)
 lambda_stack.add_dependency(lambda_layer_stack)
 lambda_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(s3_bucket_stack)
 ec2_stack.add_dependency(vpc_stack)
 for key, value in config['aws_tags'].items():
     cdk.Tags.of(app).add(key, value or " ", priority=1)
-stacks = [s3_bucket_stack, vpc_stack, lambda_layer_stack, lambda_stack, scheduler_stack, ec2_stack, sns_stack]
+stacks = [s3_bucket_stack, vpc_stack, lambda_layer_stack, lambda_stack, step_functions_stack, ec2_stack, sns_stack]
 for stack in stacks:
     stack_type = type(stack)
     stack_name = stack_type.__name__.partition('Stack')[0]

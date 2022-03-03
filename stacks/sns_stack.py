@@ -11,10 +11,11 @@ class SNSStack(cdk.Stack):
 
         topic_name = '-'.join([construct_id, 'topic'.replace(' ', '-')])
 
-        notification_topic = sns.Topic(self, 'SNSTopic',
-                                       display_name='Tell Listeners That There Are Tests Failed on Website',
-                                       topic_name=topic_name
-                                       )
+        notification_topic = sns.Topic(
+            self, 'SNSTopic',
+            display_name='Tell Listeners That There Are Tests Failed on Website',
+            topic_name=topic_name
+        )
         for subscriber in subscribers:
             notification_topic.add_subscription(subscriptions.EmailSubscription(email_address=subscriber))
         notification_topic.apply_removal_policy(cdk.RemovalPolicy.DESTROY)

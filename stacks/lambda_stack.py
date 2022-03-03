@@ -16,76 +16,79 @@ class LambdaStack(cdk.Stack):
             construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'S3BucketName'
         )
 
-        publish_logs_to_cloudwatch_policy_name = '-'.join([construct_id, 'publish logs policy'.replace(' ', '-')])
-        publish_logs_to_cloudwatch_policy = iam.ManagedPolicy(self, 'PublishLogsPolicy',
-                                                       managed_policy_name=publish_logs_to_cloudwatch_policy_name,
-                                                       description='Policy to operate EC2 instances',
-                                                       statements=[
-                                                           iam.PolicyStatement(
-                                                               sid='AllowPublishLogsToCloudwatch',
-                                                               actions=[
-                                                                   'logs:CreateLogGroup',
-                                                                   'logs:CreateLogStream',
-                                                                   'logs:PutLogEvents'
-                                                               ],
-                                                               resources=['arn:aws-cn:logs:*:*:*']
-                                                           )
-                                                       ]
-                                                       )
-        operating_s3_policy_name = '-'.join([construct_id, 'operating s3 policy'.replace(' ', '-')])
-        operating_s3_policy = iam.ManagedPolicy(self, 'OperatingS3Policy',
-                                                managed_policy_name=operating_s3_policy_name,
-                                                description='Policy to operate S3 bucket',
-                                                statements=[
-                                                    iam.PolicyStatement(
-                                                        sid='AllowListOfSpecificBucket',
-                                                        actions=['s3:ListBucket'],
-                                                        resources=[
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
-                                                        ]
-                                                    ),
-                                                    iam.PolicyStatement(
-                                                        sid='AllowGetObjectOfSpecificBucket',
-                                                        actions=['s3:GetObject'],
-                                                        resources=[
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
-                                                        ]
-                                                    ),
-                                                    iam.PolicyStatement(
-                                                        sid='AllowPutObjectOfSpecificBucket',
-                                                        actions=['s3:PutObject'],
-                                                        resources=[
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name,
-                                                            'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
-                                                        ]
-                                                    )
-                                                ]
-                                                )
-        deleting_s3_object_policy_name = '-'.join([construct_id, 'deleting s3 object policy'.replace(' ', '-')])
-        deleting_s3_object_policy = iam.ManagedPolicy(self, 'DeletingS3ObjectPolicy',
-                                                      managed_policy_name=deleting_s3_object_policy_name,
-                                                      description='Policy to delete S3 object',
-                                                      statements=[
-                                                          iam.PolicyStatement(
-                                                              sid='AllowDeleteObjectOfSpecificBucket',
-                                                              actions=['s3:DeleteObjectVersion', 's3:DeleteObject'],
-                                                              resources=[
-                                                                  'arn:aws-cn:s3:::' + s3_bucket_name,
-                                                                  'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
-                                                              ]
-                                                          )
-                                                      ]
-                                                      )
+        publish_logs_policy_name = '-'.join([construct_id, 'publish logs to cloudwatch policy'.replace(' ', '-')])
+        publish_logs_policy = iam.ManagedPolicy(
+            self, 'PublishLogsToCloudwatchPolicy',
+            managed_policy_name=publish_logs_policy_name,
+            description='Policy to publish logs to Cloudwatch',
+            statements=[
+                iam.PolicyStatement(
+                    sid='AllowPublishLogsToCloudwatch',
+                    actions=[
+                        'logs:CreateLogGroup',
+                        'logs:CreateLogStream',
+                        'logs:PutLogEvents'
+                    ],
+                    resources=['arn:aws-cn:logs:*:*:*']
+                )
+            ]
+        )
+        download_upload_s3_policy_name = '-'.join([construct_id, 'download upload s3 object policy'.replace(' ', '-')])
+        download_upload_s3_policy = iam.ManagedPolicy(
+            self, 'DownloadUploadS3ObjectPolicy',
+            managed_policy_name=download_upload_s3_policy_name,
+            description='Policy to download and upload objects in S3 bucket',
+            statements=[
+                iam.PolicyStatement(
+                    sid='AllowListOfSpecificBucket',
+                    actions=['s3:ListBucket'],
+                    resources=[
+                        'arn:aws-cn:s3:::' + s3_bucket_name,
+                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                    ]
+                ),
+                iam.PolicyStatement(
+                    sid='AllowGetObjectOfSpecificBucket',
+                    actions=['s3:GetObject'],
+                    resources=[
+                        'arn:aws-cn:s3:::' + s3_bucket_name,
+                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                    ]
+                ),
+                iam.PolicyStatement(
+                    sid='AllowPutObjectOfSpecificBucket',
+                    actions=['s3:PutObject'],
+                    resources=[
+                        'arn:aws-cn:s3:::' + s3_bucket_name,
+                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                    ]
+                )
+            ]
+        )
+        delete_s3_policy_name = '-'.join([construct_id, 'delete s3 object policy'.replace(' ', '-')])
+        delete_s3_policy = iam.ManagedPolicy(
+            self, 'DeleteS3ObjectPolicy',
+            managed_policy_name=delete_s3_policy_name,
+            description='Policy to delete objects in S3 bucket',
+            statements=[
+                iam.PolicyStatement(
+                    sid='AllowDeleteObjectOfSpecificBucket',
+                    actions=['s3:DeleteObjectVersion', 's3:DeleteObject'],
+                    resources=[
+                        'arn:aws-cn:s3:::' + s3_bucket_name,
+                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                    ]
+                )
+            ]
+        )
         test_website_lambda_role_name = '-'.join([construct_id, 'test website role'.replace(' ', '-')])
         test_website_lambda_role = iam.Role(
             self, 'TestWebsiteLambdaRole',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
-            description="IAM role for Lambda function",
+            description="IAM role for test website Lambda function",
             managed_policies=[
-                publish_logs_to_cloudwatch_policy,
-                operating_s3_policy
+                publish_logs_policy,
+                download_upload_s3_policy
             ],
             role_name=test_website_lambda_role_name,
         )
@@ -94,11 +97,11 @@ class LambdaStack(cdk.Stack):
         generate_report_lambda_role = iam.Role(
             self, 'GenerateReportLambdaRole',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
-            description="IAM role for Lambda function",
+            description="IAM role for generate report Lambda function",
             managed_policies=[
-                publish_logs_to_cloudwatch_policy,
-                operating_s3_policy,
-                deleting_s3_object_policy
+                publish_logs_policy,
+                download_upload_s3_policy,
+                delete_s3_policy
             ],
             role_name=generate_report_lambda_role_name,
         )
@@ -107,9 +110,9 @@ class LambdaStack(cdk.Stack):
         parse_report_lambda_role = iam.Role(
             self, 'ParseReportLambdaRole',
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
-            description="IAM role for Lambda function",
+            description="IAM role for parse report Lambda function",
             managed_policies=[
-                publish_logs_to_cloudwatch_policy,
+                publish_logs_policy,
                 iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaVPCAccessExecutionRole')
             ],
             role_name=parse_report_lambda_role_name,
@@ -121,6 +124,7 @@ class LambdaStack(cdk.Stack):
             code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'test_website')),
             handler="test_website.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
+            description='Lambda function to execute website tests',
             environment={
                 's3_bucket_name': s3_bucket_name
             },
@@ -151,9 +155,12 @@ class LambdaStack(cdk.Stack):
         generate_report_lambda_function_name = '-'.join([construct_id, 'generate report function'.replace(' ', '-')])
         generate_report_lambda_function = _lambda.Function(
             self, 'GenerateReportLambda',
-            code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'generate_report')),
+            code=_lambda.Code.from_asset(
+                path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'generate_report')
+            ),
             handler="generate_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
+            description='Lambda function to generate allure report',
             environment={
                 's3_bucket_name': s3_bucket_name
             },
@@ -188,6 +195,7 @@ class LambdaStack(cdk.Stack):
             code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'parse_report')),
             handler="parse_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
+            description='Lambda function to parse tests result',
             function_name=parse_report_lambda_function_name,
             memory_size=4096,
             role=parse_report_lambda_role,
@@ -202,7 +210,9 @@ class LambdaStack(cdk.Stack):
         cdk.Tags.of(generate_report_lambda_role).add('Name', generate_report_lambda_role_name.lower(), priority=50)
         cdk.Tags.of(parse_report_lambda_role).add('Name', parse_report_lambda_role_name.lower(), priority=50)
         cdk.Tags.of(test_website_lambda_function).add('Name', test_website_lambda_function_name.lower(), priority=50)
-        cdk.Tags.of(generate_report_lambda_function).add('Name', generate_report_lambda_function_name.lower(), priority=50)
+        cdk.Tags.of(generate_report_lambda_function).add(
+            'Name', generate_report_lambda_function_name.lower(), priority=50
+        )
         cdk.Tags.of(parse_report_lambda_function).add('Name', parse_report_lambda_function_name.lower(), priority=50)
         cdk.Tags.of(parse_report_sg).add('Name', parse_report_sg_name.lower(), priority=50)
 

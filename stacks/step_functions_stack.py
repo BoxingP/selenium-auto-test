@@ -10,7 +10,7 @@ from aws_cdk import (
 )
 
 
-class SchedulerStack(cdk.Stack):
+class StepFunctionsStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -70,53 +70,56 @@ class SchedulerStack(cdk.Stack):
             result_path='$'
         )
 
-        job_succeeded = sfn.Succeed(self, 'JobIsSucceeded')
+        job_succeeded_job = sfn.Succeed(self, 'JobIsSucceeded')
 
-        is_sent_notification = sfn.Choice(self, 'DecideWhetherSendNotification', output_path='$.report.tests')
-        is_sent_notification.when(
+        is_sent_notification_job = sfn.Choice(self, 'DecideWhetherSendNotification', output_path='$.report.tests')
+        is_sent_notification_job.when(
             sfn.Condition.number_less_than_json_path('$.report.summary.passed', '$.report.summary.num_tests'),
-            parse_report_job.next(send_notification_job).next(job_succeeded)
+            parse_report_job.next(send_notification_job).next(job_succeeded_job)
         )
-        is_sent_notification.otherwise(job_succeeded)
+        is_sent_notification_job.otherwise(job_succeeded_job)
 
-        definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification)
+        definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification_job)
 
-        job_machine_role_name = '-'.join([construct_id, 'state machine role'.replace(' ', '-')])
-        job_machine_role = iam.Role(
-            self, 'JobMachineRole',
+        state_machine_role_name = '-'.join([construct_id, 'state machine role'.replace(' ', '-')])
+        state_machine_role = iam.Role(
+            self, 'StateMachineRole',
             assumed_by=iam.ServicePrincipal('states.amazonaws.com'),
-            description='IAM role for job machine',
+            description="IAM role for testing website's state machine",
             managed_policies=[],
-            role_name=job_machine_role_name,
+            role_name=state_machine_role_name,
         )
-        job_machine_name = '-'.join([construct_id, 'state machine'.replace(' ', '-')])
-        job_machine = sfn.StateMachine(self, 'JobMachine',
-                                       definition=definition,
-                                       role=job_machine_role,
-                                       state_machine_name=job_machine_name,
-                                       timeout=cdk.Duration.minutes(20))
+        state_machine_name = '-'.join([construct_id, 'state machine'.replace(' ', '-')])
+        state_machine = sfn.StateMachine(
+            self, 'StateMachine',
+            definition=definition,
+            role=state_machine_role,
+            state_machine_name=state_machine_name,
+            timeout=cdk.Duration.minutes(20)
+        )
 
         event_rule_role_name = '-'.join([construct_id, 'event rule role'.replace(' ', '-')])
         event_rule_role = iam.Role(
             self, 'EventRuleRole',
             assumed_by=iam.ServicePrincipal('events.amazonaws.com'),
-            description='IAM role for event rule',
+            description='IAM role for event rule which triggers testing website',
             managed_policies=[],
             role_name=event_rule_role_name,
         )
-        scheduler_event_name = '-'.join([construct_id, 'rule'.replace(' ', '-')])
-        scheduler_event = events.Rule(
-            self, "ScheduleRule",
+        event_rule_name = '-'.join([construct_id, 'rule'.replace(' ', '-')])
+        event_rule = events.Rule(
+            self, "EventRule",
             description='To trigger the testing for website',
-            rule_name=scheduler_event_name,
+            enabled=True,
+            rule_name=event_rule_name,
             schedule=events.Schedule.expression('cron(*/10 * * * ? *)'),
             targets=[
                 targets.SfnStateMachine(
-                    job_machine, role=event_rule_role
+                    state_machine, role=event_rule_role
                 )
             ]
         )
 
-        cdk.Tags.of(job_machine_role).add('Name', job_machine_role_name.lower(), priority=50)
-        cdk.Tags.of(job_machine).add('Name', job_machine_name.lower(), priority=50)
+        cdk.Tags.of(state_machine_role).add('Name', state_machine_role_name.lower(), priority=50)
+        cdk.Tags.of(state_machine).add('Name', state_machine_name.lower(), priority=50)
         cdk.Tags.of(event_rule_role).add('Name', event_rule_role_name.lower(), priority=50)
