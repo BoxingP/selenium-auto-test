@@ -9,7 +9,11 @@ aws_ec2_inbounds:
     port:
       - 0 - 65535
     description: 'from Shanghai office'
+aws_event_schedule: 'cron(*/10 * * * ? *)'
 aws_s3_versioned: False
+aws_sns_subject: 'There Are Failed Tests Occurred on the {{ tested_domain.capitalize() }}'
+aws_sns_topic: 'Tell Listeners That There Are Tests Failed on {{ tested_domain.capitalize() }}'
+aws_subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
 aws_tags:
   Name:
   app role:
@@ -25,4 +29,3 @@ aws_tags:
 aws_vpc_cidr: '10.5.0.0/16'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
-subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]

@@ -97,3 +97,18 @@
     dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/utils/users.json'
     force: yes
   become: yes
+
+- name: generate test website config file
+  block:
+    - name: fetch template from remote
+      fetch:
+        src: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/config.json.j2'
+        dest: '/tmp/'
+        flat: yes
+        fail_on_missing : yes
+      run_once: yes
+    - name: upload file to remote
+      template:
+        src: '/tmp/config.json.j2'
+        dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/config.json'
+        force: yes

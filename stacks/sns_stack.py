@@ -6,14 +6,14 @@ from aws_cdk import (
 
 
 class SNSStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, subscribers: list, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, topic: str, subscribers: list, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         topic_name = '-'.join([construct_id, 'topic'.replace(' ', '-')])
 
         notification_topic = sns.Topic(
             self, 'SNSTopic',
-            display_name='Tell Listeners That There Are Tests Failed on Website',
+            display_name=topic,
             topic_name=topic_name
         )
         for subscriber in subscribers:

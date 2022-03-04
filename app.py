@@ -26,8 +26,11 @@ environment = config['environment']
 inbounds = config['aws_ec2_inbounds']
 is_versioned = config['aws_s3_versioned']
 project = config['project']
-subscribers = config['subscribers']
+sns_subject = config['aws_sns_subject']
+sns_topic = config['aws_sns_topic']
+subscribers = config['aws_subscribers']
 vpc_cidr = config['aws_vpc_cidr']
+event_schedule = config['aws_event_schedule']
 
 app = cdk.App()
 s3_bucket_stack = S3BucketStack(
@@ -37,7 +40,12 @@ s3_bucket_stack = S3BucketStack(
 vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
 lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
 lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), vpc=vpc_stack.vpc, env=aws_environment)
-step_functions_stack = StepFunctionsStack(app, '-'.join([project, environment, 'stepfunctions']), env=aws_environment)
+step_functions_stack = StepFunctionsStack(
+    app, '-'.join([project, environment, 'stepfunctions']),
+    schedule=event_schedule,
+    subject=sns_subject,
+    env=aws_environment
+)
 date_now = datetime.datetime.now().strftime("%Y%m%d")
 ec2_stack = EC2Stack(
     app, '-'.join([project, environment, 'ec2']),
@@ -47,7 +55,7 @@ ec2_stack = EC2Stack(
     ),
     env=aws_environment
 )
-sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), subscribers, env=aws_environment)
+sns_stack = SNSStack(app, '-'.join([project, environment, 'sns']), sns_topic, subscribers, env=aws_environment)
 step_functions_stack.add_dependency(lambda_stack)
 step_functions_stack.add_dependency(sns_stack)
 lambda_stack.add_dependency(lambda_layer_stack)

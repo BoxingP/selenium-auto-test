@@ -11,7 +11,7 @@ from aws_cdk import (
 
 
 class StepFunctionsStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, schedule: str, subject: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         test_website_job = sfn_tasks.LambdaInvoke(
@@ -65,7 +65,7 @@ class StepFunctionsStack(cdk.Stack):
                 )
             ),
             message=sfn.TaskInput.from_json_path_at("$.message"),
-            subject='There Are Failed Tests Occurred on the Website',
+            subject=subject,
             input_path='$.notification',
             result_path='$'
         )
@@ -112,7 +112,7 @@ class StepFunctionsStack(cdk.Stack):
             description='To trigger the testing for website',
             enabled=True,
             rule_name=event_rule_name,
-            schedule=events.Schedule.expression('cron(*/10 * * * ? *)'),
+            schedule=events.Schedule.expression(schedule),
             targets=[
                 targets.SfnStateMachine(
                     state_machine, role=event_rule_role
