@@ -9,77 +9,13 @@
   vars:
     query: '"{{ "-".join(( project|replace(" ", "-"), deploy_environment, item.value )) }}"'
   loop:
-    - { resource: 'ec2', value: 'ec2' }
-    - { resource: 's3', value: 's3' }
-    - { resource: 'vpc', value: 'vpc' }
+    - { resource: 'loadbalancer', value: 'lb' }
 
 - name: extract value
   set_fact:
     { "{{ item.name }}": "{{ vars[item.resource + '_resource'] | json_query(item.value) }}" }
   loop:
-    - { name: 'keypair_name', resource: 'ec2', value: 'OutputEc2KeypairName' }
-    - { name: 'ec2_public_ip', resource: 'ec2', value: 'OutputEc2InstancePublicIP' }
-    - { name: 's3_bucket_name', resource: 's3', value: 'OutputS3BucketName' }
-    - { name: 'vpc_region', resource: 'vpc', value: 'OutputVpcRegion' }
-
-- name: get play directory
-  set_fact:
-    play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}/set_up_ec2'
-
-- name: fetch template from remote
-  fetch:
-    src: '{{ play_path }}/{{ item }}'
-    dest: '/tmp/'
-    flat: yes
-    fail_on_missing: yes
-  loop:
-    - 'inventories/hosts.yaml.j2'
-    - 'docker/cron/Dockerfile.j2'
-
-- name: upload to remote
-  template:
-    src: '/tmp/{{ item.file }}.j2'
-    dest: '{{ play_path }}/{{ item.path }}/{{ item.file }}'
-    force: yes
-  loop:
-    - { file: 'hosts.yaml', path: 'inventories' }
-    - { file: 'Dockerfile', path: 'docker/cron' }
-
-- name: install epel-release
-  yum:
-    name:
-      - epel-release
-    state: present
-  become: yes
-  vars:
-    ansible_python_interpreter: /usr/bin/python2
-
-- name: install ansible
-  yum:
-    name:
-      - ansible
-    state: present
-  become: yes
-  vars:
-    ansible_python_interpreter: /usr/bin/python2
-
-- name: wait for ec2 port 22 to become open
-  wait_for:
-    port: 22
-    host: '{{ ec2_public_ip }}'
-    search_regex: OpenSSH
-    delay: 10
-    timeout: 300
-
-- name: install ansible requirements
-  command: 'ansible-galaxy collection install -r requirements.yaml'
-  args:
-    chdir: '{{ play_path }}'
-
-- name: set up ec2
-  command: 'ansible-playbook playbook.yaml'
-  args:
-    chdir: '{{ play_path }}'
+    - { name: 'keypair_name', resource: 'loadbalancer', value: 'OutputLoadBalancerEc2KeypairName' }
 
 - name: save private key
   block:

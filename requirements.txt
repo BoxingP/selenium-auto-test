@@ -1,5 +1,7 @@
 aws-cdk.core==1.128.0
+aws-cdk.aws_autoscaling==1.128.0
 aws-cdk.aws_ec2==1.128.0
+aws-cdk.aws_elasticloadbalancingv2==1.128.0
 aws-cdk.aws_events==1.128.0
 aws-cdk.aws_events_targets==1.128.0
 aws-cdk.aws_iam==1.128.0

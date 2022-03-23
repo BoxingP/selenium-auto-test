@@ -17,7 +17,7 @@ class S3BucketStack(cdk.Stack):
             versioned=is_versioned
         )
         self.lifecycle_rules(
-            s3_bucket, is_versioned, incomplete=7, is_transition=False, expiration=60
+            s3_bucket, incomplete=7, is_versioned=is_versioned
         )
 
         cdk.Tags.of(s3_bucket).add('Name', bucket_name.lower(), priority=50)
@@ -27,18 +27,19 @@ class S3BucketStack(cdk.Stack):
                       value=s3_bucket.bucket_name)
 
     @staticmethod
-    def lifecycle_rules(bucket, is_versioned: bool, incomplete: int, is_transition: bool,
-                        expiration: int, noncurrent_expiration=60, to_glacier=30):
+    def lifecycle_rules(bucket, incomplete: int, is_versioned: bool, is_expired=False, expiration=60,
+                        is_transition=False, noncurrent_expiration=60, to_glacier=30):
         bucket.add_lifecycle_rule(
             id="abort-incomplete-multipart-upload",
             abort_incomplete_multipart_upload_after=cdk.Duration.days(incomplete),
             enabled=True
         )
-        bucket.add_lifecycle_rule(
-            id="expiration",
-            expiration=cdk.Duration.days(expiration),
-            enabled=True
-        )
+        if is_expired:
+            bucket.add_lifecycle_rule(
+                id="expiration",
+                expiration=cdk.Duration.days(expiration),
+                enabled=True
+            )
         if is_transition:
             bucket.add_lifecycle_rule(
                 id="transitions-to-glacier",

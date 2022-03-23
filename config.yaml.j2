@@ -1,15 +1,24 @@
 ---
-aws_ec2_ami: 'ami-0f8d4b3ca40ae0bc6'
+aws_ec2_ami: 'ami-0ead00c12317b2010'
 aws_ec2_inbounds:
   - ip: '222.126.242.202/32'
     port:
-      - 0 - 65535
-    description: 'from Shanghai office'
+      - 22
+    description: 'ssh from Shanghai office'
   - ip: '222.126.242.203/32'
     port:
-      - 0 - 65535
-    description: 'from Shanghai office'
+      - 22
+    description: 'ssh from Shanghai office'
 aws_event_schedule: 'cron(*/10 * * * ? *)'
+aws_loadbalancer_inbounds:
+  - ip: '222.126.242.202/32'
+    port:
+      - 80
+    description: 'visit from Shanghai office'
+  - ip: '222.126.242.203/32'
+    port:
+      - 80
+    description: 'visit from Shanghai office'
 aws_s3_versioned: False
 aws_sns_subject: 'There Are Failed Tests Occurred on the {{ tested_domain.capitalize() }}'
 aws_sns_topic: 'Tell Listeners That There Are Tests Failed on {{ tested_domain.capitalize() }}'
@@ -19,10 +28,10 @@ aws_tags:
   app role:
   application owner: '{{ owner }}'
   application: 'monitoring for thermofisher.cn'
-  businessunit:
-  costcenter:
+  businessunit: 'n/a'
+  costcenter: 'n/a'
   data classification: 'internal use'
-  division:
+  division: 'n/a'
   environment: '{{ deploy_environment }}'
   project: '{{ project | lower }}'
   snow support: 'cn.corp.mst.digital operations'
