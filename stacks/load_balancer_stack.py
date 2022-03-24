@@ -122,20 +122,22 @@ class LoadBalancerStack(cdk.Stack):
                     ),
                     description=inbound['description']
                 )
+        load_balancer_name = '-'.join([construct_id, 'app'])
         load_balancer = elbv2.ApplicationLoadBalancer(
             self, 'LoadBalancer',
             security_group=loadbalancer_security_group,
             vpc=vpc,
             internet_facing=True,
-            load_balancer_name='-'.join([construct_id, 'app'])
+            load_balancer_name=load_balancer_name
         )
         load_balancer.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+        target_group_name = '-'.join([construct_id, 'tg'])
         target_group = elbv2.ApplicationTargetGroup(
             self, 'TargetGroup',
             port=80,
             protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[auto_scaling_group],
-            target_group_name='-'.join([construct_id, 'tg']),
+            target_group_name=target_group_name,
             vpc=vpc
         )
         listener = elbv2.ApplicationListener(
@@ -157,6 +159,8 @@ class LoadBalancerStack(cdk.Stack):
         cdk.Tags.of(iam_role).add('Name', iam_role_name.lower(), priority=50)
         cdk.Tags.of(ec2_security_group).add('Name', ec2_security_group_name.lower(), priority=50)
         cdk.Tags.of(loadbalancer_security_group).add('Name', loadbalancer_security_group_name.lower(), priority=50)
+        cdk.Tags.of(load_balancer).add('Name', load_balancer_name.lower(), priority=50)
+        cdk.Tags.of(target_group).add('Name', target_group_name.lower(), priority=50)
 
         cdk.CfnOutput(self, 'OutputLoadBalancerDnsName',
                       export_name=construct_id.title().replace('-', '') + 'DnsName',
