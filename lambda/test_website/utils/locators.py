@@ -36,7 +36,7 @@ class LoginPageLocators(object):
 class CartPageLocators(object):
     forgot_item_catalog_number_field = (By.XPATH, '//input[@name="sku" and contains(@class, "tf-input")]')
     forgot_item_quantity_field = (By.XPATH, '//input[@name="qty" and contains(@class, "tf-input")]')
-    add_forgot_to_cart_button = (By.XPATH, '//button[@type="button" and contains(@class, "tf-button1")]')
+    add_forgot_to_cart_button = (By.XPATH, '//div[@id="cartContent"]//button[not(@id="clearItems")]')
     cart_item_name = (By.XPATH, '//div[@id="cartContent"]/form//div[@class="tf-row"]//div[contains(@class, "catalog-title")]')
     order_summary_msg = (By.XPATH, '//div[@id="orderSummary"]')
     checkout_button = (By.XPATH, '//div[@id="mobileCheckoutButton"]/div/div/button')
