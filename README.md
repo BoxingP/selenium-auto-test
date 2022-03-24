@@ -9,3 +9,5 @@ Use the AMI built by [AWS EC2 Image Builder](https://github.com/BoxingP/aws-imag
 2. [Test Automation Project](https://github.com/startrug/selenium-python-framework)
 3. [Continuous Test-Reporting with Allure](https://dev.to/habereder/continuous-test-reporting-with-allure-1ag4)
 4. [pytest-json](https://github.com/mattcl/pytest-json)
+5. [Application Load Balancer](https://github.com/aws-samples/aws-cdk-examples/tree/master/python/application-load-balancer)
+6. [Outline Wiki on AWS](https://github.com/wowzoo/outline_on_aws)
