@@ -54,7 +54,7 @@ def lambda_handler(event, context):
     allure_results_dir = os.path.join(tmp_dir, 'allure_results')
     json_report_file = os.path.join(tmp_dir, 'report.json')
 
-    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '--json=' + json_report_file, '-n', '4'])
+    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '--json=' + json_report_file, '-n', '5'])
     generate_env_properties(allure_results_dir)
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
     with open(json_report_file, 'r', encoding='utf-8') as file:
