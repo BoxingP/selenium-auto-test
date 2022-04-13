@@ -13,27 +13,18 @@ class TestMainPage:
     @allure.description('This is test of open login page on main page')
     def test_login_page_opened(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open()
+        main_page.open(f"cn/zh/home.html?cid={config['cid']}")
         main_page.go_to_login_page()
         main_page.wait_url_changed_to('proxy.html')
         main_page.wait_url_changed_to('signin-identifier.html')
         login_title = '登录您的账户'
         assert login_title in main_page.find_element(*LoginPageLocators.login_title).text
 
-    @allure.title('Open quick order page test')
-    @allure.description('This is test of open quick order page on main page')
-    def test_quick_order_page_opened(self, config):
-        main_page = MainPage(self.driver, config)
-        main_page.open()
-        self.driver.get(main_page.find_element(*MainPageLocators.quick_order_link).get_attribute('href'))
-        title = 'Quick Order'
-        assert title == main_page.get_title()
-
     @allure.title('Check promotion bar exists test')
     @allure.description('This is test of check promotion bar exists on main page')
     def test_promotion_bar_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open()
+        main_page.open(f"cn/zh/home.html?cid={config['cid']}")
         assert main_page.is_element_exists(*MainPageLocators.promotion_bar) \
                and main_page.is_element_clickable(*MainPageLocators.promotion_bar)
         main_page.click(*MainPageLocators.app_tech_link)
@@ -44,7 +35,7 @@ class TestMainPage:
     @allure.description('This is test of check thin banner exists on main page')
     def test_thin_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open()
+        main_page.open(f"cn/zh/home.html?cid={config['cid']}")
         assert main_page.is_element_exists(*MainPageLocators.thin_banner) \
                and main_page.is_element_clickable(*MainPageLocators.thin_banner)
         main_page.click(*MainPageLocators.app_tech_link)
@@ -56,7 +47,7 @@ class TestMainPage:
     @allure.description('This is test of check landscape banner exists on main page')
     def test_landscape_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open('cn/zh/home/applications-techniques.html')
+        main_page.open(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
         main_page.scroll_page(direction='down')
         assert main_page.is_element_exists(*MainPageLocators.landscape_banner) \
                and main_page.is_element_clickable(*MainPageLocators.landscape_banner)
@@ -71,7 +62,7 @@ class TestMainPage:
     @allure.description('This is test of check order index exists on main page')
     def test_order_index_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open('order.html')
+        main_page.open(f"cn/zh/home/order.html?cid={config['cid']}")
         assert main_page.find_element(*MainPageLocators.order_index_img).is_displayed() \
                and main_page.is_element_clickable(*MainPageLocators.order_index_img)
 
@@ -79,7 +70,7 @@ class TestMainPage:
     @allure.description('This is test of search product on main page')
     def test_product_searched(self, config, product):
         main_page = MainPage(self.driver, config)
-        main_page.open()
+        main_page.open(f"cn/zh/home.html?cid={config['cid']}")
         main_page.input_text(product['sku'], *MainPageLocators.search_product_field)
         main_page.click(*MainPageLocators.search_product_button)
         main_page.wait_element_to_be_visible(*MainPageLocators.search_product_result)

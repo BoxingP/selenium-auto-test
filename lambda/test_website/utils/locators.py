@@ -11,7 +11,6 @@ class MainPageLocators(object):
     sign_in_link = (By.ID, 'signIn')
     user_profile_menu = (By.ID, 'hfUserProfileLink')
     sign_out_link = (By.ID, 'hfB2cCmgtSignOutLink')
-    quick_order_link = (By.XPATH, '//div[contains(@class, "homeiconone")]/div[@class="iconone3"]/p/b/a')
     promotion_bar = (By.XPATH, '//div[@id="promoBarContent"]/a')
     app_tech_link = (By.XPATH, '//ul[@id="meganav-content"]/li[2]/a')
     thin_banner = (By.XPATH, '//div[contains(@class, "thinbanner")]/a')
@@ -49,6 +48,8 @@ class CartPageLocators(object):
     empty_cart_button = (By.XPATH, '//div[@id="cartContent"]/form//a[contains(@class, "line-item-empty")]')
     confirm_empty_cart_button = (By.XPATH, '//div[@id="empty-cart-modal"]//div/button[contains(@class, "primary-action")]')
     cart_emptied_msg = (By.XPATH, '//div[@id="cartContent"]//div/div/span[contains(@class, "strong-alt")]')
+    quick_add_product_to_cart_button = (By.XPATH, '//div[contains(@class, "quick-order-app")]//div[contains(@class, "quick-order")]//form/div/div/button[2]')
+    fill_out_error_msg = (By.XPATH, '//div[@class="container-wrap"]//form/div/div[3]/div')
 
 
 class ProductPageLocators(object):

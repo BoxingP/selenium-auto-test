@@ -11,5 +11,5 @@ class TestHomePage:
     @allure.description('This is test of open home page')
     def test_page_loaded(self, config):
         home_page = HomePage(self.driver, config)
-        home_page.open()
+        home_page.open(f"cn/zh/home.html?cid={config['cid']}")
         assert home_page.check_page_loaded()

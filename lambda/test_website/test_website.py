@@ -15,12 +15,12 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
             relative_path = os.path.relpath(file_path, local_directory)
             s3_path = os.path.join(s3_directory, relative_path).replace('\\', '/')
 
-            print('Searching "%s" in "%s"' % (s3_path, s3_bucket))
+            print(f'Searching "{s3_path}" in "{s3_bucket}"')
             try:
                 client.head_object(Bucket=s3_bucket, Key=s3_path)
-                print('File found, skipped %s' % s3_path)
+                print(f"File found, skipped {s3_path}")
             except botocore.exceptions.ClientError:
-                print('Uploading %s ...' % s3_path)
+                print(f"Uploading {s3_path} ...")
                 client.upload_file(file_path, s3_bucket, s3_path)
 
 
@@ -28,11 +28,11 @@ def generate_env_properties(target_path, config_path=os.path.join(os.path.dirnam
     with open(config_path, 'r', encoding='UTF-8') as file:
         config = json.load(file)
     with open(os.path.join(target_path, 'environment.properties'), 'w', encoding='UTF-8') as file:
-        line1 = 'Browser=%s\n' % config['browser']
-        line2 = 'BrowserVersion=%s\n' % config['headless_chromium']
-        line3 = 'Environment=%s\n' % config['environment']
-        line4 = 'Python=%s\n' % config['python']
-        line5 = 'TestedPage=%s' % config['tested_page']
+        line1 = f"Browser={config['browser']}\n"
+        line2 = f"BrowserVersion={config['headless_chromium']}\n"
+        line3 = f"Environment={config['environment']}\n"
+        line4 = f"Python={config['python']}\n"
+        line5 = f"MonitoredSite={config['base_url']}"
         file.writelines([line1, line2, line3, line4, line5])
 
 
@@ -45,7 +45,7 @@ def empty_directory(directory):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+            print(f"Failed to delete {file_path}. Reason: {e}")
 
 
 def lambda_handler(event, context):
@@ -54,7 +54,9 @@ def lambda_handler(event, context):
     allure_results_dir = os.path.join(tmp_dir, 'allure_results')
     json_report_file = os.path.join(tmp_dir, 'report.json')
 
-    pytest.main([tests_dir, '--alluredir=' + allure_results_dir, '--cache-clear', '--json=' + json_report_file, '-n', '5'])
+    pytest.main(
+        [tests_dir, f"--alluredir={allure_results_dir}", '--cache-clear', f"--json={json_report_file}", '-n', '5']
+    )
     generate_env_properties(allure_results_dir)
     upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
     with open(json_report_file, 'r', encoding='utf-8') as file:

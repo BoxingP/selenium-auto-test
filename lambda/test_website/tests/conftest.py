@@ -20,7 +20,7 @@ def config():
 
 @pytest.fixture(scope='session')
 def website_setup(config):
-    return config['tested_page'] if 'tested_page' in config else DEFAULT_WEBSITE
+    return config['base_url'] if 'base_url' in config else DEFAULT_WEBSITE
 
 
 @pytest.fixture(scope='session')

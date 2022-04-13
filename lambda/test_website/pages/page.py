@@ -25,7 +25,7 @@ class Page(object):
         return True
 
     def open(self, url=''):
-        self.driver.get(self.config['tested_page'] + url)
+        self.driver.get(self.config['base_url'] + url)
 
     @allure.step('Getting title of the page')
     def get_title(self):
