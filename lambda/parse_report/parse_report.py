@@ -17,7 +17,7 @@ def generate_notification_msg(failed_tests: list):
             sentence = sentence + '%s: %s\n' % (key.upper(), value)
         content = content + '\n%s' % sentence
         index += 1
-    message = 'Failed tests:\n{}\nPlease check the details in the Allure report.'.format(content)
+    message = f"Failed tests:\n{content}\nPlease check the details in the Allure report:\nhttp://{os.environ['allure_report_endpoint']}"
     return message
 
 

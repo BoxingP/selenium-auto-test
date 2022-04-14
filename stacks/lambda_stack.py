@@ -15,6 +15,9 @@ class LambdaStack(cdk.Stack):
         s3_bucket_name = cdk.Fn.import_value(
             construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'S3BucketName'
         )
+        load_balancer_dns = cdk.Fn.import_value(
+            construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'LbDnsName'
+        )
 
         publish_logs_policy_name = '-'.join([construct_id, 'publish logs to cloudwatch policy'.replace(' ', '-')])
         publish_logs_policy = iam.ManagedPolicy(
@@ -196,6 +199,9 @@ class LambdaStack(cdk.Stack):
             handler="parse_report.lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_6,
             description='Lambda function to parse tests result',
+            environment={
+                'allure_report_endpoint': load_balancer_dns
+            },
             function_name=parse_report_lambda_function_name,
             memory_size=4096,
             role=parse_report_lambda_role,

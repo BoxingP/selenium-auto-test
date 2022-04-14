@@ -66,6 +66,7 @@ step_functions_stack.add_dependency(lambda_stack)
 step_functions_stack.add_dependency(sns_stack)
 lambda_stack.add_dependency(lambda_layer_stack)
 lambda_stack.add_dependency(s3_bucket_stack)
+lambda_stack.add_dependency(load_balancer_stack)
 load_balancer_stack.add_dependency(s3_bucket_stack)
 load_balancer_stack.add_dependency(vpc_stack)
 for key, value in config['aws_tags'].items():
