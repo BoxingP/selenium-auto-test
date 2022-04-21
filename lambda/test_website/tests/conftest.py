@@ -1,12 +1,11 @@
 import json
 import os
 
-import allure
 import pytest
-from allure_commons.types import AttachmentType
 
 from utils.driver_factory import DriverFactory
 from utils.json_report import JSONReport
+from utils.screenshot import Screenshot
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.json')
 DEFAULT_WEBSITE = 'https://www.baidu.com/'
@@ -39,7 +38,7 @@ def setup(request, config):
     before_failed = request.session.testsfailed
     yield
     if request.session.testsfailed != before_failed:
-        allure.attach(driver.get_screenshot_as_png(), name="Test failed", attachment_type=AttachmentType.PNG)
+        Screenshot.take_screenshot(driver, config, 'test failed', test=request.node.name)
     driver.quit()
 
 

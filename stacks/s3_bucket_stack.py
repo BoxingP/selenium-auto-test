@@ -1,23 +1,41 @@
 from aws_cdk import (
+    aws_iam as iam,
     aws_s3 as s3,
     core as cdk
 )
 
 
 class S3BucketStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, bucket_name: str, is_versioned: bool, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, bucket_name: str, is_versioned: bool, public_dir: str,
+                 **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         s3_bucket = s3.Bucket(
             self, 'S3Bucket',
             auto_delete_objects=False,
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            block_public_access=s3.BlockPublicAccess(
+                block_public_acls=True,
+                ignore_public_acls=True,
+                block_public_policy=False,
+                restrict_public_buckets=False
+            ),
             bucket_name=bucket_name,
             removal_policy=cdk.RemovalPolicy.DESTROY,
             versioned=is_versioned
         )
         self.lifecycle_rules(
             s3_bucket, incomplete=7, is_versioned=is_versioned
+        )
+        s3_bucket.add_to_resource_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                principals=[iam.AnyPrincipal()],
+                actions=['s3:GetObject'],
+                resources=[
+                    f'arn:aws-cn:s3:::{bucket_name}/{public_dir}/*'
+                ],
+                sid='AllowPublicAccessForSpecificFolder'
+            )
         )
 
         cdk.Tags.of(s3_bucket).add('Name', bucket_name.lower(), priority=50)

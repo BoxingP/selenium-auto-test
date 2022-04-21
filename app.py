@@ -33,11 +33,12 @@ subscribers = config['aws_subscribers']
 vpc_cidr = config['aws_vpc_cidr']
 event_schedule = config['aws_event_schedule']
 aws_s3_bucket_name = '-'.join([project, environment, 's3'])
+public_dir = config['allure_screenshots_dir']
 
 app = cdk.App()
 s3_bucket_stack = S3BucketStack(
     app, '-'.join([project, environment, 's3']),
-    bucket_name=aws_s3_bucket_name, is_versioned=is_versioned, env=aws_environment
+    bucket_name=aws_s3_bucket_name, is_versioned=is_versioned, public_dir=public_dir, env=aws_environment
 )
 vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
 lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)

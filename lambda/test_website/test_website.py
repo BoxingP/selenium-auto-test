@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import shutil
@@ -24,9 +25,7 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
                 client.upload_file(file_path, s3_bucket, s3_path)
 
 
-def generate_env_properties(target_path, config_path=os.path.join(os.path.dirname(__file__), 'config.json')):
-    with open(config_path, 'r', encoding='UTF-8') as file:
-        config = json.load(file)
+def generate_env_properties(target_path, config):
     with open(os.path.join(target_path, 'environment.properties'), 'w', encoding='UTF-8') as file:
         line1 = f"Browser={config['browser']}\n"
         line2 = f"BrowserVersion={config['headless_chromium']}\n"
@@ -48,17 +47,49 @@ def empty_directory(directory):
             print(f"Failed to delete {file_path}. Reason: {e}")
 
 
+def delete_files_in_s3(key_word: str, s3_bucket=os.environ['s3_bucket_name'], s3_directory=''):
+    client = boto3.client('s3')
+    objects = []
+    paginator = client.get_paginator('list_objects_v2')
+    page_iterator = paginator.paginate(Bucket=s3_bucket, Prefix=s3_directory)
+    for obj in page_iterator.search(f'Contents[?contains(Key, `{key_word}`)][]'):
+        if obj is None:
+            break
+        if not obj['Key'].endswith('/'):
+            objects.append(obj['Key'])
+    if objects:
+        for obj in objects:
+            print(f'Deleting {obj} ...')
+            client.delete_object(Bucket=s3_bucket, Key=obj)
+
+
+def update_start_flag(flag: str, local_directory: str, s3_directory=''):
+    if not os.path.exists(local_directory):
+        os.makedirs(local_directory)
+    flag_path = os.path.join(local_directory, f'{flag}_{datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")}.txt')
+    with open(flag_path, 'w') as file:
+        pass
+    delete_files_in_s3(key_word=flag, s3_directory=s3_directory)
+    upload_files_to_s3(local_directory, s3_directory=s3_directory)
+
+
 def lambda_handler(event, context):
+    config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+    with open(config_path, 'r', encoding='UTF-8') as file:
+        config = json.load(file)
     tests_dir = os.path.join(os.path.dirname(__file__), 'tests')
     tmp_dir = os.path.join(os.path.abspath(os.sep), 'tmp')
-    allure_results_dir = os.path.join(tmp_dir, 'allure_results')
+    allure_results_dir = os.path.join(tmp_dir, config['allure_results_dir'])
+    screenshots_dir = os.path.join(tmp_dir, config['screenshots_dir'])
     json_report_file = os.path.join(tmp_dir, 'report.json')
 
+    update_start_flag(flag='last_run_utc', local_directory=screenshots_dir, s3_directory=config['screenshots_dir'])
     pytest.main(
         [tests_dir, f"--alluredir={allure_results_dir}", '--cache-clear', f"--json={json_report_file}", '-n', '5']
     )
-    generate_env_properties(allure_results_dir)
-    upload_files_to_s3(allure_results_dir, s3_directory='allure_results')
+    generate_env_properties(allure_results_dir, config)
+    upload_files_to_s3(allure_results_dir, s3_directory=config['allure_results_dir'])
+    upload_files_to_s3(screenshots_dir, s3_directory=config['screenshots_dir'])
     with open(json_report_file, 'r', encoding='utf-8') as file:
         report = json.loads(file.read())
     empty_directory(directory=tmp_dir)

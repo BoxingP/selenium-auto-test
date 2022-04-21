@@ -1,4 +1,7 @@
 ---
+alarm_system_api: ''
+allure_results_dir: 'allure_results'
+allure_screenshots_dir: 'screenshots'
 aws_ec2_ami: 'ami-04403ee6f0e6b7a9e'
 aws_ec2_inbounds:
   - ip: '222.126.242.202/32'
@@ -38,3 +41,4 @@ aws_tags:
 aws_vpc_cidr: '10.5.0.0/16'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
+tested_site: 'https://www.{{ tested_domain }}/'

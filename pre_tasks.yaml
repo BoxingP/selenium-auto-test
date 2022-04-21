@@ -91,24 +91,37 @@
     - /tmp/allure-2.16.1.zip
   become: yes
 
+- name: get play directory
+  set_fact:
+    play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}'
+
 - name: import users' credentials
   copy:
     src: 'vars/selenium_auto_test_users.json'
-    dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/utils/users.json'
+    dest: '{{ play_path }}/lambda/test_website/utils/users.json'
     force: yes
   become: yes
 
-- name: generate test website config file
-  block:
-    - name: fetch template from remote
-      fetch:
-        src: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/config.json.j2'
-        dest: '/tmp/'
-        flat: yes
-        fail_on_missing : yes
-      run_once: yes
-    - name: upload file to remote
-      template:
-        src: '/tmp/config.json.j2'
-        dest: '{{ hostvars["localhost"]["code"]["local_path"] }}/lambda/test_website/config.json'
-        force: yes
+- name: fetch files from remote
+  fetch:
+    src: '{{ play_path }}/{{ item.path }}'
+    dest: '/tmp/{{ item.file }}'
+    flat: yes
+    fail_on_missing: yes
+  loop:
+    - { file: 'config.yaml', path: 'config.yaml' }
+    - { file: 'test_website_config.json.j2', path: 'lambda/test_website/config.json.j2' }
+    - { file: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json.j2' }
+
+- name: load variables from config file
+  include_vars:
+    file: '/tmp/config.yaml'
+
+- name: upload to remote
+  template:
+    src: '/tmp/{{ item.template }}'
+    dest: '{{ play_path }}/{{ item.path }}'
+    force: yes
+  loop:
+    - { template: 'test_website_config.json.j2', path: 'lambda/test_website/config.json' }
+    - { template: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json' }

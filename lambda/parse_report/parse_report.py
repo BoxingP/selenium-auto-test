@@ -1,7 +1,10 @@
 import json
 import os
+import re
 import urllib.request
 from string import Template
+
+import boto3
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
 
@@ -21,12 +24,47 @@ def generate_notification_msg(failed_tests: list):
     return message
 
 
+def get_latest_file(key_word: str, s3_bucket=os.environ['s3_bucket_name'], target_dir='') -> str:
+    client = boto3.client('s3')
+    objects = []
+    paginator = client.get_paginator('list_objects_v2')
+    page_iterator = paginator.paginate(Bucket=s3_bucket, Prefix=target_dir)
+    for obj in page_iterator.search(f'Contents[?contains(Key, `{key_word}`)][]'):
+        if not obj['Key'].endswith('/'):
+            objects.append(obj['Key'])
+    objects.sort()
+    if objects:
+        return objects[-1]
+    else:
+        return ''
+
+
+def get_date(string: str) -> int:
+    try:
+        return int(re.search('_([0-9]+).', string).group(1))
+    except AttributeError:
+        return 0
+
+
+def get_screenshot_url(test_name: str, s3_bucket=os.environ['s3_bucket_name'], screenshots_dir='') -> str:
+    client = boto3.client('s3')
+    location = client.get_bucket_location(Bucket=s3_bucket)['LocationConstraint']
+    screenshot_name = get_latest_file(key_word=test_name, target_dir=screenshots_dir)
+    screenshot_date = get_date(screenshot_name)
+    start_flag = get_date(get_latest_file(key_word='last_run_utc', target_dir=screenshots_dir))
+
+    if screenshot_date:
+        if screenshot_date > start_flag:
+            return f'https://{s3_bucket}.s3.{location}.amazonaws.com.cn/{screenshot_name}'
+    return ''
+
+
 def get_failed_tests(json_data):
     failed_tests = []
     for test in json_data:
         if test['outcome'] == 'passed':
             continue
-        name = '::'.join(test['name'].split("::")[-2:])
+        name = '::'.join(test['name'].split('::')[-2:])
         stage_outcome = []
         stage_detail = []
         for key in ('name', 'duration', 'run_index', 'outcome'):
@@ -41,9 +79,12 @@ def get_failed_tests(json_data):
             stage_detail.append('\n  %s: %s' % (stage['name'], detail))
 
         summary = ', '.join(stage_outcome)
+        screenshot_url = ''
+        if 'call' in summary:
+            screenshot_url = get_screenshot_url(test_name=name.split('::')[1], screenshots_dir='screenshots')
         detail = '  '.join(stage_detail)
 
-        failed_tests.append({'name': name, 'reason': summary, 'error': detail})
+        failed_tests.append({'name': name, 'reason': summary, 'screenshot': screenshot_url, 'error': detail})
 
     return failed_tests
 

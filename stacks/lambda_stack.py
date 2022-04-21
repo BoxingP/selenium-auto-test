@@ -36,34 +36,47 @@ class LambdaStack(cdk.Stack):
                 )
             ]
         )
-        download_upload_s3_policy_name = '-'.join([construct_id, 'download upload s3 object policy'.replace(' ', '-')])
-        download_upload_s3_policy = iam.ManagedPolicy(
-            self, 'DownloadUploadS3ObjectPolicy',
-            managed_policy_name=download_upload_s3_policy_name,
-            description='Policy to download and upload objects in S3 bucket',
+        read_s3_policy_name = '-'.join([construct_id, 'read s3 object policy'.replace(' ', '-')])
+        read_s3_policy = iam.ManagedPolicy(
+            self, 'ReadS3ObjectPolicy',
+            managed_policy_name=read_s3_policy_name,
+            description='Policy to read objects in S3 bucket',
             statements=[
                 iam.PolicyStatement(
                     sid='AllowListOfSpecificBucket',
                     actions=['s3:ListBucket'],
                     resources=[
-                        'arn:aws-cn:s3:::' + s3_bucket_name,
-                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                        f'arn:aws-cn:s3:::{s3_bucket_name}',
+                        f'arn:aws-cn:s3:::{s3_bucket_name}/*'
                     ]
                 ),
                 iam.PolicyStatement(
                     sid='AllowGetObjectOfSpecificBucket',
                     actions=['s3:GetObject'],
                     resources=[
-                        'arn:aws-cn:s3:::' + s3_bucket_name,
-                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                        f'arn:aws-cn:s3:::{s3_bucket_name}/*'
                     ]
                 ),
+                iam.PolicyStatement(
+                    sid='AllowGetBucketLocation',
+                    actions=['s3:GetBucketLocation'],
+                    resources=[
+                        f'arn:aws-cn:s3:::{s3_bucket_name}'
+                    ]
+                )
+            ]
+        )
+        upload_s3_policy_name = '-'.join([construct_id, 'upload s3 object policy'.replace(' ', '-')])
+        upload_s3_policy = iam.ManagedPolicy(
+            self, 'UploadS3ObjectPolicy',
+            managed_policy_name=upload_s3_policy_name,
+            description='Policy to upload objects in S3 bucket',
+            statements=[
                 iam.PolicyStatement(
                     sid='AllowPutObjectOfSpecificBucket',
                     actions=['s3:PutObject'],
                     resources=[
-                        'arn:aws-cn:s3:::' + s3_bucket_name,
-                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                        f'arn:aws-cn:s3:::{s3_bucket_name}/*'
                     ]
                 )
             ]
@@ -78,8 +91,7 @@ class LambdaStack(cdk.Stack):
                     sid='AllowDeleteObjectOfSpecificBucket',
                     actions=['s3:DeleteObjectVersion', 's3:DeleteObject'],
                     resources=[
-                        'arn:aws-cn:s3:::' + s3_bucket_name,
-                        'arn:aws-cn:s3:::' + s3_bucket_name + '/*'
+                        f'arn:aws-cn:s3:::{s3_bucket_name}/*'
                     ]
                 )
             ]
@@ -91,7 +103,9 @@ class LambdaStack(cdk.Stack):
             description="IAM role for test website Lambda function",
             managed_policies=[
                 publish_logs_policy,
-                download_upload_s3_policy
+                read_s3_policy,
+                upload_s3_policy,
+                delete_s3_policy
             ],
             role_name=test_website_lambda_role_name,
         )
@@ -103,7 +117,8 @@ class LambdaStack(cdk.Stack):
             description="IAM role for generate report Lambda function",
             managed_policies=[
                 publish_logs_policy,
-                download_upload_s3_policy,
+                read_s3_policy,
+                upload_s3_policy,
                 delete_s3_policy
             ],
             role_name=generate_report_lambda_role_name,
@@ -116,7 +131,8 @@ class LambdaStack(cdk.Stack):
             description="IAM role for parse report Lambda function",
             managed_policies=[
                 publish_logs_policy,
-                iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaVPCAccessExecutionRole')
+                iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaVPCAccessExecutionRole'),
+                read_s3_policy
             ],
             role_name=parse_report_lambda_role_name,
         )
@@ -200,7 +216,8 @@ class LambdaStack(cdk.Stack):
             runtime=_lambda.Runtime.PYTHON_3_6,
             description='Lambda function to parse tests result',
             environment={
-                'allure_report_endpoint': load_balancer_dns
+                'allure_report_endpoint': load_balancer_dns,
+                's3_bucket_name': s3_bucket_name
             },
             function_name=parse_report_lambda_function_name,
             memory_size=4096,

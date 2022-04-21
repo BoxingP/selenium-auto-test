@@ -1,10 +1,12 @@
 {
+    "allure_results_dir": "{{ allure_results_dir }}",
+    "base_url": "{{ tested_site }}",
     "browser": "chrome",
     "cid": "tingyun",
     "environment": "{{ deploy_environment }}",
     "headless_mode": true,
     "headless_chromium": 69,
     "python": 3.6,
-    "base_url": "https://www.{{ tested_domain }}/",
+    "screenshots_dir": "{{ allure_screenshots_dir }}",
     "timeout": 30
 }
