@@ -22,7 +22,10 @@ def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], 
                 print(f"File found, skipped {s3_path}")
             except botocore.exceptions.ClientError:
                 print(f"Uploading {s3_path} ...")
-                client.upload_file(file_path, s3_bucket, s3_path)
+                extra_args = None
+                if file_path.endswith('.png'):
+                    extra_args = {'ContentType': 'image/png'}
+                client.upload_file(file_path, s3_bucket, s3_path, ExtraArgs=extra_args)
 
 
 def generate_env_properties(target_path, config):
