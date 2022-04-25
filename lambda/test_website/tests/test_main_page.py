@@ -20,31 +20,31 @@ class TestMainPage:
         login_title = '登录您的账户'
         assert login_title in main_page.find_element(*LoginPageLocators.login_title).text
 
-    @allure.title('Check promotion bar exists test')
-    @allure.description('This is test of check promotion bar exists on main page')
-    def test_promotion_bar_exists(self, config):
+    @allure.title('Check header banner exists test')
+    @allure.description('This is test of check header banner exists on pages')
+    def test_header_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open(f"cn/zh/home.html?cid={config['cid']}")
-        assert main_page.is_element_exists(*MainPageLocators.promotion_bar) \
-               and main_page.is_element_clickable(*MainPageLocators.promotion_bar)
+        assert main_page.is_element_exists(*MainPageLocators.header_banner) \
+               and main_page.is_element_clickable(*MainPageLocators.header_banner)
         main_page.click(*MainPageLocators.app_tech_link)
-        assert main_page.is_element_exists(*MainPageLocators.promotion_bar) \
-               and main_page.is_element_clickable(*MainPageLocators.promotion_bar)
+        assert main_page.is_element_exists(*MainPageLocators.header_banner) \
+               and main_page.is_element_clickable(*MainPageLocators.header_banner)
 
-    @allure.title('Check thin banner exists test')
-    @allure.description('This is test of check thin banner exists on main page')
-    def test_thin_banner_exists(self, config):
+    @allure.title('Check yellow thin banner exists test')
+    @allure.description('This is test of check yellow thin banner exists on pages')
+    def test_yellow_thin_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open(f"cn/zh/home.html?cid={config['cid']}")
-        assert main_page.is_element_exists(*MainPageLocators.thin_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.thin_banner)
+        assert main_page.is_element_exists(*MainPageLocators.yellow_thin_banner) \
+               and main_page.is_element_clickable(*MainPageLocators.yellow_thin_banner)
         main_page.click(*MainPageLocators.app_tech_link)
-        assert main_page.is_element_exists(*MainPageLocators.thin_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.thin_banner)
+        assert main_page.is_element_exists(*MainPageLocators.yellow_thin_banner) \
+               and main_page.is_element_clickable(*MainPageLocators.yellow_thin_banner)
 
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Check landscape banner exists test')
-    @allure.description('This is test of check landscape banner exists on main page')
+    @allure.description('This is test of check landscape banner exists on pages')
     def test_landscape_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
