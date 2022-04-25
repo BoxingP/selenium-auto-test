@@ -42,6 +42,14 @@ class TestMainPage:
         assert main_page.is_element_exists(*MainPageLocators.yellow_thin_banner) \
                and main_page.is_element_clickable(*MainPageLocators.yellow_thin_banner)
 
+    @allure.title('Check top banner exists test')
+    @allure.description('This is test of check top banner exists on main page')
+    def test_top_banner_exists(self, config):
+        main_page = MainPage(self.driver, config)
+        main_page.open(f"cn/zh/home.html?cid={config['cid']}")
+        main_page.wait_element_to_be_visible(*MainPageLocators.top_banner)
+        assert main_page.is_element_exists(*MainPageLocators.top_banner)
+
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
     @allure.title('Check landscape banner exists test')
     @allure.description('This is test of check landscape banner exists on pages')

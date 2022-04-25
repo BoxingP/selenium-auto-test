@@ -14,6 +14,7 @@ class MainPageLocators(object):
     header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
     app_tech_link = (By.XPATH, '//ul[@id="meganav-content"]/li[2]/a')
     yellow_thin_banner = (By.XPATH, '//div[contains(@class, "thinbanner")]/a')
+    top_banner = (By.ID, 'ggBox')
     landscape_banner = (By.XPATH, '//div[@id="landscapeBannerContent"]/a')
     order_index_img = (By.XPATH, '//a/div/picture/img')
     search_product_field = (By.ID, 'suggest1')
