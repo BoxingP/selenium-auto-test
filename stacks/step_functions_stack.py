@@ -72,7 +72,7 @@ class StepFunctionsStack(cdk.Stack):
 
         job_succeeded_job = sfn.Succeed(self, 'JobIsSucceeded')
 
-        is_sent_notification_job = sfn.Choice(self, 'DecideWhetherSendNotification', output_path='$.report.tests')
+        is_sent_notification_job = sfn.Choice(self, 'DecideWhetherSendNotification', output_path='$')
         is_sent_notification_job.when(
             sfn.Condition.number_less_than_json_path('$.report.summary.passed', '$.report.summary.num_tests'),
             parse_report_job.next(send_notification_job).next(job_succeeded_job)

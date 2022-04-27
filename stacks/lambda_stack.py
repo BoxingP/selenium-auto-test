@@ -104,8 +104,7 @@ class LambdaStack(cdk.Stack):
             managed_policies=[
                 publish_logs_policy,
                 read_s3_policy,
-                upload_s3_policy,
-                delete_s3_policy
+                upload_s3_policy
             ],
             role_name=test_website_lambda_role_name,
         )

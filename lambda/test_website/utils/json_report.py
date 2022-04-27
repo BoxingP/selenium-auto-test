@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import re
-import time
 
 
 class JSONReport(object):
@@ -95,16 +94,19 @@ class JSONReport(object):
         self.nodes[report.nodeid]['duration'] += stage_report['duration']
 
     def pytest_sessionstart(self, session):
-        self.session_start_time = time.time()
+        self.session_start_time = datetime.datetime.utcnow()
 
     def pytest_sessionfinish(self, session):
-        session_stop_time = time.time()
+        session_stop_time = datetime.datetime.utcnow()
         session_duration = session_stop_time - self.session_start_time
+        utc_fmt = '%Y-%m-%d %H:%M:%S.%f+0000'
 
-        self.created_at = str(datetime.datetime.now())
+        self.created_at = datetime.datetime.utcnow().strftime(utc_fmt)
 
         self.summary['num_tests'] = len(self.nodes)
-        self.summary['duration'] = session_duration
+        self.summary['started_at'] = self.session_start_time.strftime(utc_fmt)
+        self.summary['stopped_at'] = session_stop_time.strftime(utc_fmt)
+        self.summary['duration'] = session_duration.total_seconds()
 
         tests = []
         for test, detail in self.nodes.items():
