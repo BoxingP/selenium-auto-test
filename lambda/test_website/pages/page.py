@@ -78,7 +78,6 @@ class Page(object):
         except TimeoutException:
             print('\n * ELEMENT NOT FOUND WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
-            self.driver.quit()
 
     def wait_element_to_be_clickable(self, *locator):
         timeout = self.config['timeout']
@@ -87,7 +86,6 @@ class Page(object):
         except TimeoutException:
             print('\n * ELEMENT NOT CLICKABLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
-            self.driver.quit()
 
     def wait_element_to_be_visible(self, *locator):
         timeout = self.config['timeout']
@@ -96,7 +94,6 @@ class Page(object):
         except TimeoutException:
             print('\n * ELEMENT NOT VISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
-            self.driver.quit()
 
     def wait_text_to_be_display(self, text, *locator):
         timeout = self.config['timeout']
@@ -105,7 +102,6 @@ class Page(object):
         except TimeoutException:
             print('\n * %s NOT DISPLAY WITHIN %s SECONDS! --> %s' % (text, timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{text} not display')
-            self.driver.quit()
 
     def wait_url_changed_to(self, url):
         timeout = self.config['timeout']
