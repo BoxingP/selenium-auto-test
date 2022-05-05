@@ -65,7 +65,7 @@
 - name: check for allure
   changed_when: false
   stat:
-    path: '/tmp/allure.zip'
+    path: '/tmp/allure-2.16.1.zip'
   register: allure_result
 
 - name: download allure from remote
@@ -89,6 +89,14 @@
     remote_src: yes
   loop:
     - /tmp/allure-2.16.1.zip
+  become: yes
+
+- name: enable custom logo plugin in allure
+  lineinfile:
+    path: '/tmp/allure/allure-2.16.1/config/allure.yml'
+    line: '  - custom-logo-plugin'
+    insertafter: EOF
+    state: present
   become: yes
 
 - name: get play directory
