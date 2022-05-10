@@ -2,6 +2,7 @@ import allure
 
 from pages.page import Page
 from utils.locators import ProductPageLocators
+from utils.logger import _step
 
 
 class ProductPage(Page):
@@ -9,6 +10,7 @@ class ProductPage(Page):
         self.locator = ProductPageLocators
         super(ProductPage, self).__init__(driver, config)
 
+    @_step
     @allure.step('Add product by catalog number: {catalog_number}')
     def add_product(self, catalog_number, quantity):
         self.input_text('9999', *self.locator.product_quantity_field, is_overwrite=True)

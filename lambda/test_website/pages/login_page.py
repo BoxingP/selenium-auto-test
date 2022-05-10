@@ -2,6 +2,7 @@ import allure
 
 from pages.page import Page
 from utils.locators import LoginPageLocators, MainPageLocators
+from utils.logger import _step
 from utils.users import User
 
 
@@ -10,6 +11,7 @@ class LoginPage(Page):
         self.locator = LoginPageLocators
         super(LoginPage, self).__init__(driver, config)
 
+    @_step
     @allure.step('Login with user: {user}')
     def login(self, user):
         user = User().get_user(user)
@@ -18,6 +20,7 @@ class LoginPage(Page):
         self.input_text(user['password'], *self.locator.password_field)
         self.click(*self.locator.sign_in_button)
 
+    @_step
     @allure.step('Logout')
     def logout(self):
         self.hover(*MainPageLocators.user_profile_menu)

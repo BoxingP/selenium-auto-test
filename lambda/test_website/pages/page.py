@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+from utils.logger import _step
 from utils.screenshot import Screenshot
 
 
@@ -25,7 +26,9 @@ class Page(object):
             return False
         return True
 
-    def open(self, url=''):
+    @_step
+    @allure.step('Opening the page')
+    def open_page(self, url=''):
         self.driver.get(self.config['base_url'] + url)
 
     @allure.step('Getting title of the page')
@@ -63,6 +66,7 @@ class Page(object):
         else:
             return False
 
+    @_step
     @allure.step('Scrolling page {direction}')
     def scroll_page(self, direction):
         html = self.driver.find_element_by_tag_name('html')

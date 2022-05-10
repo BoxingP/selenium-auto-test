@@ -9,6 +9,6 @@ class HomePage(Page):
         self.locator = HomePageLocators
         super(HomePage, self).__init__(driver, config)
 
-    @allure.step('Open home page')
+    @allure.step('Check home page whether loaded')
     def check_page_loaded(self):
         return True if self.find_element(*self.locator.logo_image) else False

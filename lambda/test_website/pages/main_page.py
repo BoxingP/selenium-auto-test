@@ -2,6 +2,7 @@ import allure
 
 from pages.page import Page
 from utils.locators import MainPageLocators
+from utils.logger import _step
 
 
 class MainPage(Page):
@@ -9,7 +10,14 @@ class MainPage(Page):
         self.locator = MainPageLocators
         super(MainPage, self).__init__(driver, config)
 
+    @_step
     @allure.step('Open login page')
     def go_to_login_page(self):
         self.hover(*self.locator.my_account_menu)
         self.click(*self.locator.sign_in_link)
+
+    @_step
+    @allure.step('Search product')
+    def search_product(self, words):
+        self.input_text(words, *self.locator.search_product_field)
+        self.click(*self.locator.search_product_button)
