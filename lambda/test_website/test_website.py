@@ -1,4 +1,3 @@
-import datetime
 import json
 import os
 import shutil
@@ -50,18 +49,6 @@ def empty_directory(directory):
             print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-def add_date_tag(logs_dir):
-    filenames = []
-    current = datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S')
-    for root, dirs, files in os.walk(logs_dir):
-        filenames.extend(files)
-        break
-    if filenames:
-        for filename in filenames:
-            new_filename = '{0}_{2}.{1}'.format(*filename.rsplit('.', 1) + [current])
-            os.rename(os.path.join(logs_dir, filename), os.path.join(logs_dir, new_filename))
-
-
 def lambda_handler(event, context):
     config_path = os.path.join(os.path.dirname(__file__), 'config.json')
     with open(config_path, 'r', encoding='UTF-8') as file:
@@ -81,7 +68,6 @@ def lambda_handler(event, context):
     generate_env_properties(allure_results_dir, config)
     upload_files_to_s3(allure_results_dir, s3_directory=config['allure_results_dir'])
     upload_files_to_s3(screenshots_dir, s3_directory=config['screenshots_dir'])
-    add_date_tag(logs_dir)
     upload_files_to_s3(logs_dir, s3_directory=config['logs_dir'])
     with open(json_report_file, 'r', encoding='utf-8') as file:
         report = json.loads(file.read())

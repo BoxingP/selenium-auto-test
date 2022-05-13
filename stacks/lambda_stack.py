@@ -118,7 +118,8 @@ class LambdaStack(cdk.Stack):
                 publish_logs_policy,
                 read_s3_policy,
                 upload_s3_policy,
-                delete_s3_policy
+                delete_s3_policy,
+                iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaVPCAccessExecutionRole'),
             ],
             role_name=generate_report_lambda_role_name,
         )
@@ -170,6 +171,17 @@ class LambdaStack(cdk.Stack):
         )
         test_website_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
+        generate_report_sg_name = '-'.join([construct_id, 'generate report sg'.replace(' ', '-')])
+        generate_report_sg = ec2.SecurityGroup(
+            self, 'GenerateReportLambdaSecurityGroup', vpc=vpc,
+            description='Security group for generate report lambda',
+            security_group_name=generate_report_sg_name
+        )
+        generate_report_sg.add_egress_rule(
+            peer=ec2.Peer.ipv4('0.0.0.0/0'),
+            connection=ec2.Port.all_traffic(),
+            description='internet'
+        )
         generate_report_lambda_function_name = '-'.join([construct_id, 'generate report function'.replace(' ', '-')])
         generate_report_lambda_function = _lambda.Function(
             self, 'GenerateReportLambda',
@@ -188,11 +200,24 @@ class LambdaStack(cdk.Stack):
                     self, 'AllureLayer', layer_version_arn=cdk.Fn.import_value(
                         construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'AllureLayerArn'
                     )
+                ),
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'Psycopg2Layer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'Psycopg2LayerArn'
+                    )
+                ),
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self, 'SqlalchemyLayer', layer_version_arn=cdk.Fn.import_value(
+                        construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'SqlalchemyLayerArn'
+                    )
                 )
             ],
             memory_size=4096,
             role=generate_report_lambda_role,
-            timeout=cdk.Duration.seconds(900)
+            security_groups=[generate_report_sg],
+            timeout=cdk.Duration.seconds(900),
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnets=vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE).subnets)
         )
         generate_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 

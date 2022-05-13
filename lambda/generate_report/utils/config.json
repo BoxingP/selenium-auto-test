@@ -1,0 +1,10 @@
+{
+  "database": {
+    "adapter": "postgresql+psycopg2",
+    "host": "",
+    "port": "",
+    "database": "official_site_monitor",
+    "user": "",
+    "password": ""
+  }
+}

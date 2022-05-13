@@ -99,6 +99,86 @@
     state: present
   become: yes
 
+- name: install psycopg2
+  block:
+
+    - name: check for postgresql
+      changed_when: false
+      stat:
+        path: '/tmp/postgresql-11.12.tar.bz2'
+      register: postgresql_result
+
+    - name: download postgresql from remote
+      when: not postgresql_result.stat.exists
+      get_url:
+        url: https://ftp.postgresql.org/pub/source/v11.12/postgresql-11.12.tar.bz2
+        dest: '/tmp/postgresql-11.12.tar.bz2'
+        checksum: sha1:4058af97fde72064c5fd18a508eda6a5526359df
+        timeout: 300
+
+    - name: check for psycopg2
+      changed_when: false
+      stat:
+        path: '/tmp/psycopg2-2_9_3.tar.gz'
+      register: psycopg2_result
+
+    - name: download psycopg2 from remote
+      when: not psycopg2_result.stat.exists
+      get_url:
+        url: https://github.com/psycopg/psycopg2/archive/refs/tags/2_9_3.tar.gz
+        dest: '/tmp/psycopg2-2_9_3.tar.gz'
+        checksum: sha1:9a9d9275a76e49d59c999e18dfaac1d61b671832
+        timeout: 300
+
+    - name: extract files into directory
+      unarchive:
+        src: '{{ item.file }}'
+        dest: '{{ item.directory }}'
+        remote_src: yes
+      loop:
+        - file: /tmp/postgresql-11.12.tar.bz2
+          directory: /tmp
+        - file: /tmp/psycopg2-2_9_3.tar.gz
+          directory: /tmp
+
+    - name: build postgresql
+      shell: |
+        ./configure --prefix "/tmp/pg" --without-readline --without-zlib &&
+        make &&
+        make install
+      args:
+        chdir: '/tmp/postgresql-11.12'
+      become: yes
+
+    - name: build psycopg2
+      shell: |
+        sed -ri -e "s#pg_config=.*#pg_config=/tmp/pg/bin/pg_config#" setup.cfg &&
+        sed -ri -e "s#static_libpq=.*#static_libpq=1#" setup.cfg &&
+        python3 setup.py build
+      args:
+        chdir: '/tmp/psycopg2-2_9_3'
+      become: yes
+
+    - name: create psycopg2 directory
+      file:
+        path: /tmp/psycopg2/python
+        state: directory
+
+    - name: generate psycopg2 directory content
+      shell: |
+        cp -pR build/lib.*/* /tmp/psycopg2/python &&
+        strip /tmp/psycopg2/python/psycopg2/*.so
+      args:
+        chdir: '/tmp/psycopg2-2_9_3'
+
+- name: install sqlalchemy
+  pip:
+    name:
+      - SQLAlchemy==1.4.32
+    virtualenv: /tmp/sqlalchemy/python
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+
 - name: get play directory
   set_fact:
     play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}'

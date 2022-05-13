@@ -50,6 +50,26 @@ class LambdaLayerStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
+        psycopg2_layer = _lambda.LayerVersion(
+            self, 'Psycopg2Layer',
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'psycopg2')),
+            compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
+            compatible_runtimes=[
+                _lambda.Runtime.PYTHON_3_6
+            ],
+            removal_policy=cdk.RemovalPolicy.DESTROY
+        )
+
+        sqlalchemy_layer = _lambda.LayerVersion(
+            self, 'SqlalchemyLayer',
+            code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'sqlalchemy')),
+            compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
+            compatible_runtimes=[
+                _lambda.Runtime.PYTHON_3_6
+            ],
+            removal_policy=cdk.RemovalPolicy.DESTROY
+        )
+
         cdk.CfnOutput(self, 'OutputPytestLayerArn',
                       export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'PytestLayerArn',
                       value=pytest_layer.layer_version_arn)
@@ -62,3 +82,9 @@ class LambdaLayerStack(cdk.Stack):
         cdk.CfnOutput(self, 'OutputAllureLayerArn',
                       export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'AllureLayerArn',
                       value=allure_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputPsycopg2LayerArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'Psycopg2LayerArn',
+                      value=psycopg2_layer.layer_version_arn)
+        cdk.CfnOutput(self, 'OutputSqlalchemyLayerArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'SqlalchemyLayerArn',
+                      value=sqlalchemy_layer.layer_version_arn)
