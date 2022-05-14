@@ -150,11 +150,21 @@
         chdir: '/tmp/postgresql-11.12'
       become: yes
 
+    - name: change psycopg2 config
+      lineinfile:
+        path: /tmp/psycopg2-2_9_3/setup.cfg
+        regexp: '{{ item.regex }}'
+        line: '{{ item.value }}'
+        state: present
+      loop:
+        - regex: ^pg_config=.*$
+          value: pg_config=/tmp/pg/bin/pg_config
+        - regex: ^static_libpq=.*$
+          value: static_libpq=1
+      become: yes
+
     - name: build psycopg2
-      shell: |
-        sed -ri -e "s#pg_config=.*#pg_config=/tmp/pg/bin/pg_config#" setup.cfg &&
-        sed -ri -e "s#static_libpq=.*#static_libpq=1#" setup.cfg &&
-        python3 setup.py build
+      shell: python3 setup.py build
       args:
         chdir: '/tmp/psycopg2-2_9_3'
       become: yes
