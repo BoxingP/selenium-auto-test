@@ -17,6 +17,7 @@ class CartPage(Page):
         if quantity is not None:
             self.input_text(quantity, *self.locator.forgot_item_quantity_field, is_overwrite=True)
         self.click(*self.locator.add_forgot_to_cart_button)
+        self.wait_element_to_be_clickable(*self.locator.empty_cart_button)
 
     @_step
     @allure.step('Empty cart')

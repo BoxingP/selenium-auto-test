@@ -2,6 +2,7 @@ import allure
 
 from pages.page import Page
 from utils.locators import HomePageLocators
+from utils.logger import _step
 
 
 class HomePage(Page):
@@ -9,6 +10,7 @@ class HomePage(Page):
         self.locator = HomePageLocators
         super(HomePage, self).__init__(driver, config)
 
+    @_step
     @allure.step('Check home page whether loaded')
     def check_page_loaded(self):
         return True if self.find_element(*self.locator.logo_image) else False
