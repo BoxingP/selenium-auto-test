@@ -19,6 +19,7 @@ class Logger(object):
 
     def get_logger(self, name, config):
         logging.config.dictConfig(config)
+        logging.Formatter.converter = time.gmtime
         logger = logging.getLogger(name)
         logger.setLevel(self.level)
         return logger
