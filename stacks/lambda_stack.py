@@ -137,6 +137,17 @@ class LambdaStack(cdk.Stack):
             role_name=parse_report_lambda_role_name,
         )
 
+        random_sleep_lambda_role_name = '-'.join([construct_id, 'random sleep role'.replace(' ', '-')])
+        random_sleep_lambda_role = iam.Role(
+            self, 'RandomSleepLambdaRole',
+            assumed_by=iam.ServicePrincipal('lambda.amazonaws.com.cn'),
+            description="IAM role for random sleep Lambda function",
+            managed_policies=[
+                publish_logs_policy
+            ],
+            role_name=random_sleep_lambda_role_name,
+        )
+
         test_website_lambda_function_name = '-'.join([construct_id, 'test website function'.replace(' ', '-')])
         test_website_lambda_function = _lambda.Function(
             self, 'TestWebsiteLambda',
@@ -253,6 +264,20 @@ class LambdaStack(cdk.Stack):
         )
         parse_report_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
+        random_sleep_lambda_function_name = '-'.join([construct_id, 'random sleep function'.replace(' ', '-')])
+        random_sleep_lambda_function = _lambda.Function(
+            self, 'RandomSleepLambda',
+            code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'random_sleep')),
+            handler="random_sleep.lambda_handler",
+            runtime=_lambda.Runtime.PYTHON_3_6,
+            description='Lambda function to random sleep',
+            function_name=random_sleep_lambda_function_name,
+            memory_size=128,
+            role=random_sleep_lambda_role,
+            timeout=cdk.Duration.seconds(120)
+        )
+        random_sleep_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
+
         cdk.Tags.of(test_website_lambda_role).add('Name', test_website_lambda_role_name.lower(), priority=50)
         cdk.Tags.of(generate_report_lambda_role).add('Name', generate_report_lambda_role_name.lower(), priority=50)
         cdk.Tags.of(parse_report_lambda_role).add('Name', parse_report_lambda_role_name.lower(), priority=50)
@@ -272,3 +297,6 @@ class LambdaStack(cdk.Stack):
         cdk.CfnOutput(self, 'OutputParseReportLambdaArn',
                       export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'ParseReportLambdaArn',
                       value=parse_report_lambda_function.function_arn)
+        cdk.CfnOutput(self, 'OutputRandomSleepLambdaArn',
+                      export_name=construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'RandomSleepLambdaArn',
+                      value=random_sleep_lambda_function.function_arn)

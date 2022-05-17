@@ -14,6 +14,18 @@ class StepFunctionsStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, schedule: str, subject: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        random_sleep_job = sfn_tasks.LambdaInvoke(
+            self, 'RandomSleep',
+            lambda_function=_lambda.Function.from_function_arn(
+                self, 'RandomSleepLambda',
+                function_arn=cdk.Fn.import_value(
+                    construct_id.rsplit('-', 1)[0].title().replace('-', '') + 'RandomSleepLambdaArn'
+                )
+            ),
+            output_path=sfn.JsonPath.DISCARD,
+            timeout=cdk.Duration.minutes(2)
+        )
+
         test_website_job = sfn_tasks.LambdaInvoke(
             self, 'TestWebsite',
             lambda_function=_lambda.Function.from_function_arn(
@@ -26,7 +38,7 @@ class StepFunctionsStack(cdk.Stack):
             result_selector={
                 'report.$': '$.Payload.report'
             },
-            timeout=cdk.Duration.minutes(5)
+            timeout=cdk.Duration.minutes(15)
         )
 
         generate_report_job = sfn_tasks.LambdaInvoke(
@@ -79,7 +91,10 @@ class StepFunctionsStack(cdk.Stack):
         )
         is_sent_notification_job.otherwise(job_succeeded_job)
 
-        definition = sfn.Chain.start(test_website_job).next(generate_report_job).next(is_sent_notification_job)
+        definition = sfn.Chain.start(random_sleep_job) \
+            .next(test_website_job) \
+            .next(generate_report_job) \
+            .next(is_sent_notification_job)
 
         state_machine_role_name = '-'.join([construct_id, 'state machine role'.replace(' ', '-')])
         state_machine_role = iam.Role(
