@@ -46,7 +46,7 @@ def generate_allure_reports(s3, local_path):
     local_history_path = os.path.join(local_path, report_path, 'history')
     move_files_from_directory_to_another(local_history_path, os.path.join(local_results_path, 'history'))
     subprocess.run(['/opt/allure-2.16.1/bin/allure', 'generate', '-c', local_results_path, '-o', local_reports_path])
-    s3.upload_files_to_s3(local_directory=local_reports_path, s3_directory=report_path)
+    s3.upload_files_to_s3(local_directory=local_reports_path, s3_directory=report_path, is_replace=True)
     s3.empty_s3_directory(s3_directory=os.path.join(result_path, '').replace('\\', '/'))
 
 

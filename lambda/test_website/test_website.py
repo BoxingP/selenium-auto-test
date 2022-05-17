@@ -2,29 +2,9 @@ import json
 import os
 import shutil
 
-import boto3
-import botocore
 import pytest
 
-
-def upload_files_to_s3(local_directory, s3_bucket=os.environ['s3_bucket_name'], s3_directory=''):
-    client = boto3.client('s3')
-    for root, dirs, files in os.walk(local_directory):
-        for file in files:
-            file_path = os.path.join(root, file)
-            relative_path = os.path.relpath(file_path, local_directory)
-            s3_path = os.path.join(s3_directory, relative_path).replace('\\', '/')
-
-            print(f'Searching "{s3_path}" in "{s3_bucket}"')
-            try:
-                client.head_object(Bucket=s3_bucket, Key=s3_path)
-                print(f"File found, skipped {s3_path}")
-            except botocore.exceptions.ClientError:
-                print(f"Uploading {s3_path} ...")
-                extra_args = None
-                if file_path.endswith('.png'):
-                    extra_args = {'ContentType': 'image/png'}
-                client.upload_file(file_path, s3_bucket, s3_path, ExtraArgs=extra_args)
+from utils.s3_bucket import S3Bucket
 
 
 def generate_env_properties(target_path, config):
@@ -50,6 +30,7 @@ def empty_directory(directory):
 
 
 def lambda_handler(event, context):
+    s3 = S3Bucket(s3_bucket=os.environ['s3_bucket_name'])
     config_path = os.path.join(os.path.dirname(__file__), 'config.json')
     with open(config_path, 'r', encoding='UTF-8') as file:
         config = json.load(file)
@@ -66,9 +47,9 @@ def lambda_handler(event, context):
         [tests_dir, f"--alluredir={allure_results_dir}", '--cache-clear', f"--json={json_report_file}", '-n', '5']
     )
     generate_env_properties(allure_results_dir, config)
-    upload_files_to_s3(allure_results_dir, s3_directory=config['allure_results_dir'])
-    upload_files_to_s3(screenshots_dir, s3_directory=config['screenshots_dir'])
-    upload_files_to_s3(logs_dir, s3_directory=config['logs_dir'])
+    s3.upload_files_to_s3(local_directory=allure_results_dir, s3_directory=config['allure_results_dir'])
+    s3.upload_files_to_s3(local_directory=screenshots_dir, s3_directory=config['screenshots_dir'])
+    s3.upload_files_to_s3(local_directory=logs_dir, s3_directory=config['logs_dir'], is_replace=True)
     with open(json_report_file, 'r', encoding='utf-8') as file:
         report = json.loads(file.read())
     empty_directory(directory=tmp_dir)
