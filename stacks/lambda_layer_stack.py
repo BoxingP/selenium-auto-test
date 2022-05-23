@@ -15,7 +15,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'pytest')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
@@ -25,7 +25,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'selenium')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
@@ -35,7 +35,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'chromedriver')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
@@ -45,7 +45,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'allure')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
@@ -55,7 +55,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'psycopg2')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
@@ -65,7 +65,7 @@ class LambdaLayerStack(cdk.Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.abspath(os.sep), 'tmp', 'sqlalchemy')),
             compatible_architectures=[_lambda.Architecture.X86_64, _lambda.Architecture.ARM_64],
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_6
+                _lambda.Runtime.PYTHON_3_7
             ],
             removal_policy=cdk.RemovalPolicy.DESTROY
         )

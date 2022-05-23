@@ -153,7 +153,7 @@ class LambdaStack(cdk.Stack):
             self, 'TestWebsiteLambda',
             code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'test_website')),
             handler="test_website.lambda_handler",
-            runtime=_lambda.Runtime.PYTHON_3_6,
+            runtime=_lambda.Runtime.PYTHON_3_7,
             description='Lambda function to execute website tests',
             environment={
                 's3_bucket_name': s3_bucket_name
@@ -200,7 +200,7 @@ class LambdaStack(cdk.Stack):
                 path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'generate_report')
             ),
             handler="generate_report.lambda_handler",
-            runtime=_lambda.Runtime.PYTHON_3_6,
+            runtime=_lambda.Runtime.PYTHON_3_7,
             description='Lambda function to generate allure report',
             environment={
                 's3_bucket_name': s3_bucket_name
@@ -248,7 +248,7 @@ class LambdaStack(cdk.Stack):
             self, 'ParseReportLambda',
             code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'parse_report')),
             handler="parse_report.lambda_handler",
-            runtime=_lambda.Runtime.PYTHON_3_6,
+            runtime=_lambda.Runtime.PYTHON_3_7,
             description='Lambda function to parse tests result',
             environment={
                 'allure_report_endpoint': load_balancer_dns,
@@ -269,7 +269,7 @@ class LambdaStack(cdk.Stack):
             self, 'RandomSleepLambda',
             code=_lambda.Code.from_asset(path=os.path.join(os.path.dirname(__file__), '..', 'lambda', 'random_sleep')),
             handler="random_sleep.lambda_handler",
-            runtime=_lambda.Runtime.PYTHON_3_6,
+            runtime=_lambda.Runtime.PYTHON_3_7,
             description='Lambda function to random sleep',
             function_name=random_sleep_lambda_function_name,
             memory_size=128,

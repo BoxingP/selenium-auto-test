@@ -13,7 +13,7 @@
 - name: install selenium
   pip:
     name:
-      - selenium==3.141.0
+      - selenium==3.14.0
     virtualenv: /tmp/selenium/python
     virtualenv_command: /usr/bin/python3 -m venv
   become: yes
