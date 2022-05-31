@@ -23,8 +23,8 @@ aws_loadbalancer_inbounds:
       - 80
     description: 'visit from Shanghai office'
 aws_s3_versioned: False
-aws_sns_subject: 'There Are Failed Tests Occurred on the {{ tested_domain.capitalize() }}'
-aws_sns_topic: 'Tell Listeners That There Are Tests Failed on {{ tested_domain.capitalize() }}'
+aws_sns_subject: 'There Are Failed Tests Occurred on the {{ test_site.capitalize() }}'
+aws_sns_topic: 'Tell Listeners That There Are Tests Failed on {{ test_site.capitalize() }}'
 aws_subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
 aws_tags:
   Name:
@@ -41,5 +41,5 @@ aws_tags:
 aws_vpc_cidr: '10.5.0.0/16'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
-tested_site: 'https://www.{{ tested_domain }}/'
 test_name_prefix: ''
+test_site_url: 'https://{{ test_site }}/'
