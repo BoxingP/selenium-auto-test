@@ -79,10 +79,10 @@ def get_failed_tests(json_data: json, directory: str):
     return failed_tests
 
 
-def send_alarm_info(failed_tests, url, template):
+def send_alarm_info(failed_tests, url, prefix, template):
     response = []
     for test in failed_tests:
-        alarm = json.loads(template.substitute(target_name=test['name'], message=test['reason']))
+        alarm = json.loads(template.substitute(target_name=f"{prefix}{test['name']}", message=test['reason']))
         params = json.dumps(alarm).encode('utf8')
         req = urllib.request.Request(url, data=params, headers={'content-type': 'application/json'})
         resource = urllib.request.urlopen(req)
@@ -111,6 +111,7 @@ def lambda_handler(event, context):
         config = json.load(file)
     alarm_template = Template(config['alarm_template'])
     url = config['url']
+    prefix = config['prefix']
     screenshots_dir = config['screenshots_dir']
 
     failed_tests = get_failed_tests(event, screenshots_dir)
@@ -119,7 +120,7 @@ def lambda_handler(event, context):
     message = ''
     generate_message_error_msg = ''
     try:
-        response = send_alarm_info(failed_tests, url, alarm_template)
+        response = send_alarm_info(failed_tests, url, prefix, alarm_template)
     except Exception as error:
         send_alarm_error_msg = repr(error)
     try:
