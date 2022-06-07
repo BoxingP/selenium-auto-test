@@ -8,8 +8,8 @@ from utils.users import User
 
 class LoginPage(Page):
     def __init__(self, driver, config):
-        self.locator = LoginPageLocators
         super(LoginPage, self).__init__(driver, config)
+        self.locator = LoginPageLocators
 
     @_step
     @allure.step('Login with user: {user}')

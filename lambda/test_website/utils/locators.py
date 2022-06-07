@@ -1,11 +1,15 @@
 from selenium.webdriver.common.by import By
 
 
-class HomePageLocators(object):
+class PageLocators(object):
+    html = (By.TAG_NAME, 'html')
+
+
+class HomePageLocators(PageLocators):
     logo_image = (By.ID, 'hfLifetechLogoImage')
 
 
-class MainPageLocators(object):
+class MainPageLocators(PageLocators):
     logo_image = (By.ID, 'hfLifetechLogoImage')
     my_account_menu = (By.ID, 'myaccount-button')
     sign_in_link = (By.ID, 'signIn')
@@ -24,7 +28,7 @@ class MainPageLocators(object):
     search_matched_product = (By.XPATH, '//div[@id="mainContent"]//h2/a[@data-res_pos="1"]')
 
 
-class LoginPageLocators(object):
+class LoginPageLocators(PageLocators):
     login_title = (By.XPATH, '//body[@id="login-app-body"]/div/div/div/div/p')
     username_field = (By.ID, 'username-field')
     next_button = (By.ID, 'next-button')
@@ -34,7 +38,7 @@ class LoginPageLocators(object):
     login_error_message = (By.ID, 'login-error-text')
 
 
-class CartPageLocators(object):
+class CartPageLocators(PageLocators):
     forgot_item_catalog_number_field = (By.XPATH, '//input[@name="sku" and contains(@class, "tf-input")]')
     forgot_item_quantity_field = (By.XPATH, '//input[@name="qty" and contains(@class, "tf-input")]')
     add_forgot_to_cart_button = (By.XPATH, '//div[@id="cartContent"]//button[not(@id="clearItems")]')
@@ -58,7 +62,7 @@ class CartPageLocators(object):
     fill_out_error_msg = (By.XPATH, '//div[@class="container-wrap"]//form/div/div[3]/div')
 
 
-class ProductPageLocators(object):
+class ProductPageLocators(PageLocators):
     product_quantity_field = (By.XPATH, '//div[@id="root"]//table/tbody/tr[1]//input[@alt="item-quantity"]')
     save_to_list_button = (By.XPATH, '//div[@id="root"]//div[@class="pdp-actions"]/div/div/button')
     add_to_cart_button = (By.XPATH, '//div[@id="root"]//div[@class="pdp-actions"]/div/div/span/button')

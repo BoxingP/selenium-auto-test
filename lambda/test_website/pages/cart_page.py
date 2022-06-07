@@ -9,8 +9,8 @@ from utils.logger import _step
 
 class CartPage(Page):
     def __init__(self, driver, config):
-        self.locator = CartPageLocators
         super(CartPage, self).__init__(driver, config)
+        self.locator = CartPageLocators
 
     @_step
     @allure.step('Add forgot item by catalog number: {catalog_number}')

@@ -7,8 +7,8 @@ from utils.logger import _step
 
 class MainPage(Page):
     def __init__(self, driver, config):
-        self.locator = MainPageLocators
         super(MainPage, self).__init__(driver, config)
+        self.locator = MainPageLocators
 
     @_step
     @allure.step('Go to cart page')

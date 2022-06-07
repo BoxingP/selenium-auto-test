@@ -7,8 +7,8 @@ from utils.logger import _step
 
 class HomePage(Page):
     def __init__(self, driver, config):
-        self.locator = HomePageLocators
         super(HomePage, self).__init__(driver, config)
+        self.locator = HomePageLocators
 
     @_step
     @allure.step('Check home page whether loaded')

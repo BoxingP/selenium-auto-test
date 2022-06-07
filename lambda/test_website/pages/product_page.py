@@ -7,8 +7,8 @@ from utils.logger import _step
 
 class ProductPage(Page):
     def __init__(self, driver, config):
-        self.locator = ProductPageLocators
         super(ProductPage, self).__init__(driver, config)
+        self.locator = ProductPageLocators
 
     @_step
     @allure.step('Add product by catalog number: {catalog_number}')

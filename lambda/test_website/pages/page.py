@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+from utils.locators import PageLocators
 from utils.logger import _step
 from utils.screenshot import Screenshot
 
@@ -13,6 +14,7 @@ class Page(object):
     def __init__(self, driver, config):
         self.driver = driver
         self.config = config
+        self.locator = PageLocators
 
     @allure.step('Finding {locator} on the page')
     def find_element(self, *locator):
@@ -69,7 +71,7 @@ class Page(object):
     @_step
     @allure.step('Scrolling page {direction}')
     def scroll_page(self, direction):
-        html = self.driver.find_element_by_tag_name('html')
+        html = self.find_element(*self.locator.html)
         if direction == 'up':
             html.send_keys(Keys.CONTROL + Keys.HOME)
         elif direction == 'down':
