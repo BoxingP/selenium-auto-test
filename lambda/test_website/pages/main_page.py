@@ -11,6 +11,12 @@ class MainPage(Page):
         super(MainPage, self).__init__(driver, config)
 
     @_step
+    @allure.step('Go to cart page')
+    def go_to_cart_page(self):
+        self.click(*self.locator.my_cart)
+        self.wait_url_changed_to('cart')
+
+    @_step
     @allure.step('Open login page')
     def go_to_login_page(self):
         self.hover(*self.locator.my_account_menu)
