@@ -31,7 +31,7 @@ project = get_config_value('project', config)
 sns_subject = get_config_value('aws.sns.subject', config)
 sns_topic = get_config_value('aws.sns.topic', config)
 subscribers = get_config_value('aws.sns.subscribers', config)
-vpc_cidr = get_config_value('aws.vpc.cidr', config)
+vpc_config = get_config_value('aws.vpc', config)
 event_schedule = get_config_value('aws.event_bridge.schedule', config)
 aws_s3_bucket_name = '-'.join([project, environment, 's3'])
 public_dir = get_config_value('allure.screenshots_dir', config)
@@ -41,7 +41,7 @@ s3_bucket_stack = S3BucketStack(
     app, '-'.join([project, environment, 's3']),
     bucket_name=aws_s3_bucket_name, is_versioned=is_versioned, public_dir=public_dir, env=aws_environment
 )
-vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_cidr, env=aws_environment)
+vpc_stack = VPCStack(app, '-'.join([project, environment, 'vpc']), vpc_config, env=aws_environment)
 lambda_layer_stack = LambdaLayerStack(app, '-'.join([project, environment, 'layer']), env=aws_environment)
 lambda_stack = LambdaStack(app, '-'.join([project, environment, 'lambda']), vpc=vpc_stack.vpc, env=aws_environment)
 step_functions_stack = StepFunctionsStack(
