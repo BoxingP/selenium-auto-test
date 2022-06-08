@@ -1,13 +1,13 @@
 {
-    "allure_results_dir": "{{ allure_results_dir }}",
-    "base_url": "{{ test_site_url }}",
+    "allure_results_dir": "{{ allure.results_dir }}",
+    "base_url": "{{ test.site_url }}",
     "browser": "chrome",
+    "browser_version": "{{ chrome.version }}",
     "cid": "tingyun",
     "environment": "{{ deploy_environment }}",
     "headless_mode": true,
-    "headless_chromium": 69,
     "logs_dir": "logs",
     "python": 3.7,
-    "screenshots_dir": "{{ allure_screenshots_dir }}",
+    "screenshots_dir": "{{ allure.screenshots_dir }}",
     "timeout": 15
 }

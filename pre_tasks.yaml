@@ -1,4 +1,39 @@
 ---
+- name: get play directory
+  set_fact:
+    play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}'
+
+- name: import users' credentials
+  copy:
+    src: 'vars/selenium_auto_test_users.json'
+    dest: '{{ play_path }}/lambda/test_website/utils/users.json'
+    force: yes
+  become: yes
+
+- name: fetch files from remote
+  fetch:
+    src: '{{ play_path }}/{{ item.path }}'
+    dest: '/tmp/{{ item.file }}'
+    flat: yes
+    fail_on_missing: yes
+  loop:
+    - { file: 'config.yaml', path: 'config.yaml' }
+    - { file: 'test_website_config.json.j2', path: 'lambda/test_website/config.json.j2' }
+    - { file: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json.j2' }
+
+- name: load variables from config file
+  include_vars:
+    file: '/tmp/config.yaml'
+
+- name: upload to remote
+  template:
+    src: '/tmp/{{ item.template }}'
+    dest: '{{ play_path }}/{{ item.path }}'
+    force: yes
+  loop:
+    - { template: 'test_website_config.json.j2', path: 'lambda/test_website/config.json' }
+    - { template: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json' }
+
 - name: install pytest
   pip:
     name:
@@ -21,29 +56,29 @@
 - name: check for chromedriver
   changed_when: false
   stat:
-    path: '/tmp/chromedriver_linux64.zip'
+    path: '/tmp/chromedriver_{{ chromedriver.version }}.zip'
   register: chromedriver_result
 
 - name: download chromedriver from remote
   when: not chromedriver_result.stat.exists
   get_url:
-    url: https://chromedriver.storage.googleapis.com/2.43/chromedriver_linux64.zip
-    dest: '/tmp/chromedriver_linux64.zip'
-    checksum: sha1:63bce01580d6bc488aa185d572500f342f10eeef
+    url: 'https://chromedriver.storage.googleapis.com/{{ chromedriver.version }}/chromedriver_linux64.zip'
+    dest: '/tmp/chromedriver_{{ chromedriver.version }}.zip'
+    checksum: 'sha1:{{ chromedriver.sha1sum }}'
     timeout: 180
 
 - name: check for headless chromium
   changed_when: false
   stat:
-    path: '/tmp/headless_chromium_69.zip'
+    path: '/tmp/headless_chromium_{{ chrome.version }}.zip'
   register: headless_chromium_result
 
 - name: download headless chromium from remote
   when: not headless_chromium_result.stat.exists
   get_url:
-    url: https://github.com/adieuadieu/serverless-chrome/releases/download/v1.0.0-55/stable-headless-chromium-amazonlinux-2017-03.zip
-    dest: '/tmp/headless_chromium_69.zip'
-    checksum: sha1:85f5dd46b7191e2f025ec73e3b20e8c418a21d67
+    url: 'https://github.com/adieuadieu/serverless-chrome/releases/download/v{{ chrome.headless.version }}/stable-headless-chromium-amazonlinux-{{ chrome.headless.tag }}.zip'
+    dest: '/tmp/headless_chromium_{{ chrome.version }}.zip'
+    checksum: 'sha1:{{ chrome.headless.sha1sum }}'
     timeout: 300
 
 - name: create chromedriver directory
@@ -58,22 +93,22 @@
     dest: /tmp/chromedriver
     remote_src: yes
   loop:
-    - /tmp/chromedriver_linux64.zip
-    - /tmp/headless_chromium_69.zip
+    - '/tmp/chromedriver_{{ chromedriver.version }}.zip'
+    - '/tmp/headless_chromium_{{ chrome.version }}.zip'
   become: yes
 
 - name: check for allure
   changed_when: false
   stat:
-    path: '/tmp/allure-2.16.1.zip'
+    path: '/tmp/allure-{{ allure.version }}.zip'
   register: allure_result
 
 - name: download allure from remote
   when: not allure_result.stat.exists
   get_url:
-    url: https://github.com/allure-framework/allure2/releases/download/2.16.1/allure-2.16.1.zip
-    dest: '/tmp/allure-2.16.1.zip'
-    checksum: sha1:d67dae4327e0b9ebb892c5a8269e8fa604bcaa96
+    url: 'https://github.com/allure-framework/allure2/releases/download/{{ allure.version }}/allure-{{ allure.version }}.zip'
+    dest: '/tmp/allure-{{ allure.version }}.zip'
+    checksum: 'sha1:{{ allure.sha1sum }}'
     timeout: 300
 
 - name: create allure directory
@@ -88,12 +123,12 @@
     dest: /tmp/allure
     remote_src: yes
   loop:
-    - /tmp/allure-2.16.1.zip
+    - '/tmp/allure-{{ allure.version }}.zip'
   become: yes
 
 - name: enable custom logo plugin in allure
   lineinfile:
-    path: '/tmp/allure/allure-2.16.1/config/allure.yml'
+    path: '/tmp/allure/allure-{{ allure.version }}/config/allure.yml'
     line: '  - custom-logo-plugin'
     insertafter: EOF
     state: present
@@ -188,38 +223,3 @@
     virtualenv: /tmp/sqlalchemy/python
     virtualenv_command: /usr/bin/python3 -m venv
   become: yes
-
-- name: get play directory
-  set_fact:
-    play_path: '{{ hostvars["localhost"]["code"]["local_path"] }}'
-
-- name: import users' credentials
-  copy:
-    src: 'vars/selenium_auto_test_users.json'
-    dest: '{{ play_path }}/lambda/test_website/utils/users.json'
-    force: yes
-  become: yes
-
-- name: fetch files from remote
-  fetch:
-    src: '{{ play_path }}/{{ item.path }}'
-    dest: '/tmp/{{ item.file }}'
-    flat: yes
-    fail_on_missing: yes
-  loop:
-    - { file: 'config.yaml', path: 'config.yaml' }
-    - { file: 'test_website_config.json.j2', path: 'lambda/test_website/config.json.j2' }
-    - { file: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json.j2' }
-
-- name: load variables from config file
-  include_vars:
-    file: '/tmp/config.yaml'
-
-- name: upload to remote
-  template:
-    src: '/tmp/{{ item.template }}'
-    dest: '{{ play_path }}/{{ item.path }}'
-    force: yes
-  loop:
-    - { template: 'test_website_config.json.j2', path: 'lambda/test_website/config.json' }
-    - { template: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json' }

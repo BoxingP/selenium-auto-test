@@ -12,28 +12,29 @@ from stacks.s3_bucket_stack import S3BucketStack
 from stacks.sns_stack import SNSStack
 from stacks.step_functions_stack import StepFunctionsStack
 from stacks.vpc_stack import VPCStack
+from utils.config import get_config_value
 from utils.keypair import Keypair
 
 with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r', encoding='UTF-8') as file:
     config = yaml.load(file, Loader=yaml.SafeLoader)
 
-ami = config['aws_ec2_ami']
+ami = get_config_value('aws.ec2.ami', config)
 aws_environment = cdk.Environment(account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION"))
 aws_tags_list = []
-for k, v in config['aws_tags'].items():
+for k, v in get_config_value('aws.tags', config).items():
     aws_tags_list.append({'Key': k, 'Value': v or ' '})
-environment = config['environment']
-ec2_inbounds = config['aws_ec2_inbounds']
-loadbalancer_inbounds = config['aws_loadbalancer_inbounds']
-is_versioned = config['aws_s3_versioned']
-project = config['project']
-sns_subject = config['aws_sns_subject']
-sns_topic = config['aws_sns_topic']
-subscribers = config['aws_subscribers']
-vpc_cidr = config['aws_vpc_cidr']
-event_schedule = config['aws_event_schedule']
+environment = get_config_value('environment', config)
+ec2_inbounds = get_config_value('aws.ec2.inbounds', config)
+loadbalancer_inbounds = get_config_value('aws.load_balancer.inbounds', config)
+is_versioned = get_config_value('aws.s3.versioned', config)
+project = get_config_value('project', config)
+sns_subject = get_config_value('aws.sns.subject', config)
+sns_topic = get_config_value('aws.sns.topic', config)
+subscribers = get_config_value('aws.sns.subscribers', config)
+vpc_cidr = get_config_value('aws.vpc.cidr', config)
+event_schedule = get_config_value('aws.event_bridge.schedule', config)
 aws_s3_bucket_name = '-'.join([project, environment, 's3'])
-public_dir = config['allure_screenshots_dir']
+public_dir = get_config_value('allure.screenshots_dir', config)
 
 app = cdk.App()
 s3_bucket_stack = S3BucketStack(
@@ -70,7 +71,7 @@ lambda_stack.add_dependency(s3_bucket_stack)
 lambda_stack.add_dependency(load_balancer_stack)
 load_balancer_stack.add_dependency(s3_bucket_stack)
 load_balancer_stack.add_dependency(vpc_stack)
-for key, value in config['aws_tags'].items():
+for key, value in get_config_value('aws.tags', config).items():
     cdk.Tags.of(app).add(key, value or " ", priority=1)
 stacks = [s3_bucket_stack, vpc_stack, lambda_layer_stack, lambda_stack, step_functions_stack, sns_stack,
           load_balancer_stack]

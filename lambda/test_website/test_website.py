@@ -10,7 +10,7 @@ from utils.s3_bucket import S3Bucket
 def generate_env_properties(target_path, config):
     with open(os.path.join(target_path, 'environment.properties'), 'w', encoding='UTF-8') as file:
         line1 = f"Browser={config['browser']}\n"
-        line2 = f"BrowserVersion={config['headless_chromium']}\n"
+        line2 = f"BrowserVersion={config['browser_version']}\n"
         line3 = f"Environment={config['environment']}\n"
         line4 = f"Python={config['python']}\n"
         line5 = f"MonitoredSite={config['base_url']}"

@@ -1,45 +1,65 @@
 ---
 alarm_system_api: ''
-allure_results_dir: 'allure_results'
-allure_screenshots_dir: 'screenshots'
-aws_ec2_ami: 'ami-04403ee6f0e6b7a9e'
-aws_ec2_inbounds:
-  - ip: '222.126.242.202/32'
-    port:
-      - 22
-    description: 'ssh from Shanghai office'
-  - ip: '222.126.242.203/32'
-    port:
-      - 22
-    description: 'ssh from Shanghai office'
-aws_event_schedule: 'cron(*/15 1-9 ? * MON-FRI *)'
-aws_loadbalancer_inbounds:
-  - ip: '222.126.242.202/32'
-    port:
-      - 80
-    description: 'visit from Shanghai office'
-  - ip: '222.126.242.203/32'
-    port:
-      - 80
-    description: 'visit from Shanghai office'
-aws_s3_versioned: False
-aws_sns_subject: 'There Are Failed Tests Occurred on the {{ test_site.capitalize() }}'
-aws_sns_topic: 'Tell Listeners That There Are Tests Failed on {{ test_site.capitalize() }}'
-aws_subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
-aws_tags:
-  Name:
-  app role:
-  application owner: '{{ owner }}'
-  application: 'monitoring for thermofisher.cn'
-  businessunit: 'n/a'
-  costcenter: 'n/a'
-  data classification: 'internal use'
-  division: 'n/a'
-  environment: '{{ deploy_environment }}'
-  project: '{{ project | lower }}'
-  snow support: 'cn.corp.mst.digital operations'
-aws_vpc_cidr: '10.5.0.0/16'
+allure:
+  results_dir: 'allure_results'
+  screenshots_dir: 'screenshots'
+  version: '2.16.1'
+  sha1sum: 'd67dae4327e0b9ebb892c5a8269e8fa604bcaa96'
+aws:
+  ec2:
+    ami: 'ami-04403ee6f0e6b7a9e'
+    inbounds:
+      - ip: '222.126.242.202/32'
+        port:
+          - 22
+        description: 'ssh from Shanghai office'
+      - ip: '222.126.242.203/32'
+        port:
+          - 22
+        description: 'ssh from Shanghai office'
+  event_bridge:
+    schedule: 'cron(*/15 1-9 ? * MON-FRI *)'
+  load_balancer:
+    inbounds:
+      - ip: '222.126.242.202/32'
+        port:
+          - 80
+        description: 'visit from Shanghai office'
+      - ip: '222.126.242.203/32'
+        port:
+          - 80
+        description: 'visit from Shanghai office'
+  s3:
+    versioned: False
+  sns:
+    subject: 'There Are Failed Tests Occurred on the {{ test_site.capitalize() }}'
+    topic: 'Tell Listeners That There Are Tests Failed on {{ test_site.capitalize() }}'
+    subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
+  tags:
+    Name:
+    app role:
+    application owner: '{{ owner }}'
+    application: 'monitoring for thermofisher.cn'
+    businessunit: 'n/a'
+    costcenter: 'n/a'
+    data classification: 'internal use'
+    division: 'n/a'
+    environment: '{{ deploy_environment }}'
+    project: '{{ project | lower }}'
+    snow support: 'cn.corp.mst.digital operations'
+  vpc:
+    cidr: '10.5.0.0/16'
+chrome:
+  version: 69
+  headless:
+    version: '1.0.0-55'
+    tag: '2017-03'
+    sha1sum: 85f5dd46b7191e2f025ec73e3b20e8c418a21d67
+chromedriver:
+  version: '2.43'
+  sha1sum: '63bce01580d6bc488aa185d572500f342f10eeef'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
-test_name_prefix: ''
-test_site_url: 'https://{{ test_site }}/'
+test:
+  name_prefix: ''
+  site_url: 'https://{{ test_site }}/'
