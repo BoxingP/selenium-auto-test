@@ -1,6 +1,7 @@
 from time import sleep
 
 import allure
+from selenium.common.exceptions import StaleElementReferenceException
 
 from pages.page import Page
 from utils.locators import CartPageLocators
@@ -56,13 +57,16 @@ class CartPage(Page):
     def go_to_review_submit_page(self):
         self.click(*self.locator.continue_button)
         self.wait_url_changed_to('reviewAndSubmit')
-        self.wait_element_to_be_visible(*self.locator.order_summary_msg)
+        self.wait_element_to_be_visible(*self.locator.terms_conditions_msg)
 
     @_step
     @allure.step('Submit order')
     def submit_order(self, is_submit):
         if is_submit:
-            self.click(*self.locator.terms_conditions_accept_button)
+            try:
+                self.click(*self.locator.terms_conditions_accept_button)
+            except StaleElementReferenceException:
+                self.click(*self.locator.terms_conditions_accept_button)
             self.click(*self.locator.submit_order_button)
         else:
             self.click(*self.locator.back_to_cart_button)
