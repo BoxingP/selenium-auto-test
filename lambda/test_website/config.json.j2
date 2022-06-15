@@ -3,11 +3,11 @@
     "base_url": "{{ test.site_url }}",
     "browser": "chrome",
     "browser_version": "{{ chrome.version }}",
-    "cid": "tingyun",
+    "cid": "{{ test.cid }}",
     "environment": "{{ deploy_environment }}",
     "headless_mode": true,
     "logs_dir": "logs",
-    "python": 3.7,
+    "python": "{{ python.version }}",
     "screenshots_dir": "{{ allure.screenshots_dir }}",
-    "timeout": 15
+    "timeout": {{ test.timeout }}
 }

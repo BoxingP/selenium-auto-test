@@ -7,9 +7,11 @@ from aws_cdk import (
     core as cdk
 )
 
+from utils.config import get_config_value
+
 
 class LambdaStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, vpc: ec2.Vpc, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, config: dict, vpc: ec2.Vpc, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         s3_bucket_name = cdk.Fn.import_value(
@@ -176,9 +178,9 @@ class LambdaStack(cdk.Stack):
                     )
                 )
             ],
-            memory_size=10240,
+            memory_size=get_config_value('test_website.mem', config),
             role=test_website_lambda_role,
-            timeout=cdk.Duration.seconds(900)
+            timeout=cdk.Duration.seconds(get_config_value('test_website.timeout', config))
         )
         test_website_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
@@ -223,10 +225,10 @@ class LambdaStack(cdk.Stack):
                     )
                 )
             ],
-            memory_size=4096,
+            memory_size=get_config_value('generate_report.mem', config),
             role=generate_report_lambda_role,
             security_groups=[generate_report_sg],
-            timeout=cdk.Duration.seconds(900),
+            timeout=cdk.Duration.seconds(get_config_value('generate_report.timeout', config)),
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnets=vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE).subnets)
         )
@@ -255,10 +257,10 @@ class LambdaStack(cdk.Stack):
                 's3_bucket_name': s3_bucket_name
             },
             function_name=parse_report_lambda_function_name,
-            memory_size=4096,
+            memory_size=get_config_value('parse_report.mem', config),
             role=parse_report_lambda_role,
             security_groups=[parse_report_sg],
-            timeout=cdk.Duration.seconds(900),
+            timeout=cdk.Duration.seconds(get_config_value('parse_report.timeout', config)),
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnets=vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE).subnets)
         )
@@ -272,9 +274,9 @@ class LambdaStack(cdk.Stack):
             runtime=_lambda.Runtime.PYTHON_3_7,
             description='Lambda function to random sleep',
             function_name=random_sleep_lambda_function_name,
-            memory_size=128,
+            memory_size=get_config_value('random_sleep.mem', config),
             role=random_sleep_lambda_role,
-            timeout=cdk.Duration.seconds(120)
+            timeout=cdk.Duration.seconds(get_config_value('random_sleep.timeout', config))
         )
         random_sleep_lambda_function.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 

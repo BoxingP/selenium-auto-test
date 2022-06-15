@@ -9,9 +9,11 @@ from aws_cdk import (
     core as cdk
 )
 
+from utils.config import get_config_value
+
 
 class StepFunctionsStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, schedule: str, subject: str, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, config: dict, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         random_sleep_job = sfn_tasks.LambdaInvoke(
@@ -23,7 +25,7 @@ class StepFunctionsStack(cdk.Stack):
                 )
             ),
             output_path=sfn.JsonPath.DISCARD,
-            timeout=cdk.Duration.minutes(2)
+            timeout=cdk.Duration.seconds(get_config_value('timeout.random_sleep', config))
         )
 
         test_website_job = sfn_tasks.LambdaInvoke(
@@ -38,7 +40,7 @@ class StepFunctionsStack(cdk.Stack):
             result_selector={
                 'report.$': '$.Payload.report'
             },
-            timeout=cdk.Duration.minutes(15)
+            timeout=cdk.Duration.seconds(get_config_value('timeout.test_website', config))
         )
 
         generate_report_job = sfn_tasks.LambdaInvoke(
@@ -50,7 +52,7 @@ class StepFunctionsStack(cdk.Stack):
                 )
             ),
             result_path=sfn.JsonPath.DISCARD,
-            timeout=cdk.Duration.minutes(5)
+            timeout=cdk.Duration.seconds(get_config_value('timeout.generate_report', config))
         )
 
         parse_report_job = sfn_tasks.LambdaInvoke(
@@ -65,7 +67,8 @@ class StepFunctionsStack(cdk.Stack):
             result_selector={
                 'alarm.$': '$.Payload.alarm',
                 'notification.$': '$.Payload.notification'
-            }
+            },
+            timeout=cdk.Duration.seconds(get_config_value('timeout.parse_report', config))
         )
 
         send_notification_job = sfn_tasks.SnsPublish(
@@ -77,7 +80,7 @@ class StepFunctionsStack(cdk.Stack):
                 )
             ),
             message=sfn.TaskInput.from_json_path_at("$.message"),
-            subject=subject,
+            subject=get_config_value('sns.subject', config),
             input_path='$.notification',
             result_path='$'
         )
@@ -113,7 +116,7 @@ class StepFunctionsStack(cdk.Stack):
             definition=definition,
             role=state_machine_role,
             state_machine_name=state_machine_name,
-            timeout=cdk.Duration.minutes(20)
+            timeout=cdk.Duration.seconds(get_config_value('timeout.total', config))
         )
 
         event_rule_role_name = '-'.join([construct_id, 'event rule role'.replace(' ', '-')])
@@ -130,7 +133,7 @@ class StepFunctionsStack(cdk.Stack):
             description='To trigger the testing for website',
             enabled=True,
             rule_name=event_rule_name,
-            schedule=events.Schedule.expression(schedule),
+            schedule=events.Schedule.expression(get_config_value('event_bridge.schedule', config)),
             targets=[
                 targets.SfnStateMachine(
                     state_machine, role=event_rule_role

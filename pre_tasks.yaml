@@ -19,6 +19,7 @@
   loop:
     - { file: 'config.yaml', path: 'config.yaml' }
     - { file: 'test_website_config.json.j2', path: 'lambda/test_website/config.json.j2' }
+    - { file: 'generate_report_config.json.j2', path: 'lambda/generate_report/utils/config.json.j2' }
     - { file: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json.j2' }
 
 - name: load variables from config file
@@ -32,6 +33,7 @@
     force: yes
   loop:
     - { template: 'test_website_config.json.j2', path: 'lambda/test_website/config.json' }
+    - { template: 'generate_report_config.json.j2', path: 'lambda/generate_report/utils/config.json' }
     - { template: 'parse_report_config.json.j2', path: 'lambda/parse_report/config.json' }
 
 - name: install pytest

@@ -6,11 +6,12 @@ from aws_cdk import (
     core as cdk
 )
 
+from utils.config import get_config_value
+
 
 class LoadBalancerStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str,
-                 ami: str, vpc: ec2.Vpc, bucket_name: str, keypair_name: str, ec2_inbounds: list,
-                 loadbalancer_inbounds: list, **kwargs) -> None:
+                 load_balancer_config: dict, vpc: ec2.Vpc, bucket_name: str, keypair_name: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         reading_s3_policy_name = '-'.join([construct_id, 'reading s3'.replace(' ', '-')])
@@ -52,7 +53,7 @@ class LoadBalancerStack(cdk.Stack):
             description='Security group for allure report server',
             security_group_name=ec2_security_group_name
         )
-        for inbound in ec2_inbounds:
+        for inbound in get_config_value('ec2.inbounds', load_balancer_config):
             for port in inbound['port']:
                 if '-' in str(port):
                     [from_port, to_port] = str(port).split('-')
@@ -72,8 +73,9 @@ class LoadBalancerStack(cdk.Stack):
 
         auto_scaling_group = autoscaling.AutoScalingGroup(
             self, 'AutoScalingGroup',
-            instance_type=ec2.InstanceType('t2.medium'),
-            machine_image=ec2.MachineImage.generic_linux(ami_map={self.region: ami}),
+            instance_type=ec2.InstanceType(get_config_value('ec2.type', load_balancer_config)),
+            machine_image=ec2.MachineImage.generic_linux(
+                ami_map={self.region: get_config_value('ec2.ami', load_balancer_config)}),
             vpc=vpc,
             role=iam_role,
             security_group=ec2_security_group,
@@ -82,19 +84,19 @@ class LoadBalancerStack(cdk.Stack):
             auto_scaling_group_name='-'.join([construct_id, 'asg']),
             block_devices=[
                 autoscaling.BlockDevice(
-                    device_name='/dev/xvda',
+                    device_name=get_config_value('ec2.device.name', load_balancer_config),
                     volume=autoscaling.BlockDeviceVolume.ebs(
-                        volume_size=8,
+                        volume_size=get_config_value('ec2.device.volume', load_balancer_config),
                         encrypted=False,
                         delete_on_termination=True,
                         volume_type=autoscaling.EbsDeviceVolumeType.GP2
                     )
                 )
             ],
-            desired_capacity=1,
             key_name=keypair_name,
-            max_capacity=1,
-            min_capacity=1,
+            desired_capacity=get_config_value('auto_scaling.capacity.desired', load_balancer_config),
+            min_capacity=get_config_value('auto_scaling.capacity.min', load_balancer_config),
+            max_capacity=get_config_value('auto_scaling.capacity.max', load_balancer_config),
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE)
         )
         auto_scaling_group.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
@@ -105,7 +107,7 @@ class LoadBalancerStack(cdk.Stack):
             description='Security group for load balancer',
             security_group_name=loadbalancer_security_group_name
         )
-        for inbound in loadbalancer_inbounds:
+        for inbound in load_balancer_config['inbounds']:
             for port in inbound['port']:
                 if '-' in str(port):
                     [from_port, to_port] = str(port).split('-')

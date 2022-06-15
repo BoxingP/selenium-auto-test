@@ -6,8 +6,10 @@ from aws_cdk import (
 
 
 class SNSStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, topic: str, subscribers: list, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, config: dict, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        topic = config['topic']
+        subscribers = config['subscribers']
 
         topic_name = '-'.join([construct_id, 'topic'.replace(' ', '-')])
 

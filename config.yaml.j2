@@ -2,24 +2,44 @@
 alarm_system_api: ''
 allure:
   results_dir: 'allure_results'
-  screenshots_dir: 'screenshots'
+  screenshots_dir: &screenshots 'screenshots'
   version: '2.16.1'
   sha1sum: 'd67dae4327e0b9ebb892c5a8269e8fa604bcaa96'
 aws:
-  ec2:
-    ami: 'ami-04403ee6f0e6b7a9e'
-    inbounds:
-      - ip: '222.126.242.202/32'
-        port:
-          - 22
-        description: 'ssh from Shanghai office'
-      - ip: '222.126.242.203/32'
-        port:
-          - 22
-        description: 'ssh from Shanghai office'
-  event_bridge:
-    schedule: 'cron(*/15 1-9 ? * MON-FRI *)'
+  lambda:
+    random_sleep:
+      mem: 128
+      timeout: &sleep 120
+    test_website:
+      mem: 10240
+      timeout: &test 900
+    generate_report:
+      mem: 4096
+      timeout: &generate 120
+    parse_report:
+      mem: 4096
+      timeout: &parse 120
   load_balancer:
+    auto_scaling:
+      capacity:
+        desired: 1
+        min: 1
+        max: 1
+    ec2:
+      type: 't2.medium'
+      ami: 'ami-04403ee6f0e6b7a9e'
+      device:
+        name: '/dev/xvda'
+        volume: 20
+      inbounds:
+        - ip: '222.126.242.202/32'
+          port:
+            - 22
+          description: 'ssh from Shanghai office'
+        - ip: '222.126.242.203/32'
+          port:
+            - 22
+          description: 'ssh from Shanghai office'
     inbounds:
       - ip: '222.126.242.202/32'
         port:
@@ -30,36 +50,67 @@ aws:
           - 80
         description: 'visit from Shanghai office'
   s3:
-    versioned: False
+    bucket:
+      name: '{{ project | lower | replace(' ', '-') }}-{{ deploy_environment | lower | replace(' ', '-') }}-s3'
+      versioned: False
+      delete_incomplete_after_days: 7
+      expired: True
+      expire_after_days: 60
+      moved: False
+      move_to_lower_storage_class_after_days: 30
+      public_dir: *screenshots
   sns:
-    subject: 'There Are Failed Tests Occurred on the {{ test_site.capitalize() }}'
     topic: 'Tell Listeners That There Are Tests Failed on {{ test_site.capitalize() }}'
+    subject: &subject 'There Are Failed Tests Occurred on the {{ test_site.capitalize() }}'
     subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
+  step_functions:
+    event_bridge:
+      schedule: 'cron(*/15 1-9 ? * MON-FRI *)'
+    sns:
+      subject: *subject
+    timeout:
+      random_sleep: *sleep
+      test_website: *test
+      generate_report: *generate
+      parse_report: *parse
+      total: 960
   tags:
     Name:
     app role:
     application owner: '{{ owner }}'
-    application: 'monitoring for thermofisher.cn'
+    application: 'monitoring for {{ test_site | lower }}'
     businessunit: 'n/a'
     costcenter: 'n/a'
     data classification: 'internal use'
     division: 'n/a'
-    environment: '{{ deploy_environment }}'
+    environment: '{{ deploy_environment | lower }}'
     project: '{{ project | lower }}'
     snow support: 'cn.corp.mst.digital operations'
   vpc:
     cidr: '10.5.0.0/16'
+    id: ''
 chrome:
   version: 69
   headless:
     version: '1.0.0-55'
     tag: '2017-03'
-    sha1sum: 85f5dd46b7191e2f025ec73e3b20e8c418a21d67
+    sha1sum: '85f5dd46b7191e2f025ec73e3b20e8c418a21d67'
 chromedriver:
   version: '2.43'
   sha1sum: '63bce01580d6bc488aa185d572500f342f10eeef'
-environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
-project: '{{ project | lower | replace(' ', '-') }}'
+database:
+  host: ''
+  port: ''
+  database: 'official_site_monitor'
+  user: ''
+  password: ''
+project:
+  name: '{{ project | lower | replace(' ', '-') }}'
+  environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
+python:
+  version: '3.7'
 test:
+  cid: 'tingyun'
   name_prefix: ''
   site_url: 'https://{{ test_site }}/'
+  timeout: 15

@@ -4,11 +4,15 @@ from aws_cdk import (
     core as cdk
 )
 
+from utils.config import get_config_value
+
 
 class S3BucketStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, bucket_name: str, is_versioned: bool, public_dir: str,
-                 **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, config: dict, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        bucket_name = get_config_value('bucket.name', config)
+        is_versioned = get_config_value('bucket.versioned', config)
+        public_dir = get_config_value('bucket.public_dir', config)
 
         s3_bucket = s3.Bucket(
             self, 'S3Bucket',
@@ -24,7 +28,14 @@ class S3BucketStack(cdk.Stack):
             versioned=is_versioned
         )
         self.lifecycle_rules(
-            s3_bucket, incomplete=7, is_versioned=is_versioned
+            s3_bucket,
+            incomplete=get_config_value('bucket.delete_incomplete_after_days', config),
+            is_versioned=is_versioned,
+            is_expired=get_config_value('bucket.expired', config),
+            expiration=get_config_value('bucket.expire_after_days', config),
+            noncurrent_expiration=get_config_value('bucket.expire_after_days', config),
+            is_transition=get_config_value('bucket.moved', config),
+            to_lower_after_days=get_config_value('bucket.move_to_lower_storage_class_after_days', config)
         )
         s3_bucket.add_to_resource_policy(
             iam.PolicyStatement(
@@ -45,8 +56,8 @@ class S3BucketStack(cdk.Stack):
                       value=s3_bucket.bucket_name)
 
     @staticmethod
-    def lifecycle_rules(bucket, incomplete: int, is_versioned: bool, is_expired=False, expiration=60,
-                        is_transition=False, noncurrent_expiration=60, to_glacier=30):
+    def lifecycle_rules(bucket, incomplete: int, is_versioned: bool, is_expired: bool, expiration: int,
+                        is_transition: bool, noncurrent_expiration: int, to_lower_after_days: int):
         bucket.add_lifecycle_rule(
             id="abort-incomplete-multipart-upload",
             abort_incomplete_multipart_upload_after=cdk.Duration.days(incomplete),
@@ -64,24 +75,25 @@ class S3BucketStack(cdk.Stack):
                 transitions=[
                     s3.Transition(
                         storage_class=s3.StorageClass.GLACIER,
-                        transition_after=cdk.Duration.days(to_glacier)
+                        transition_after=cdk.Duration.days(to_lower_after_days)
                     )
                 ],
                 enabled=True
             )
         if is_versioned:
-            bucket.add_lifecycle_rule(
-                id="noncurrent-version-expiration",
-                noncurrent_version_expiration=cdk.Duration.days(noncurrent_expiration),
-                enabled=True
-            )
+            if is_expired:
+                bucket.add_lifecycle_rule(
+                    id="noncurrent-version-expiration",
+                    noncurrent_version_expiration=cdk.Duration.days(noncurrent_expiration),
+                    enabled=True
+                )
             if is_transition:
                 bucket.add_lifecycle_rule(
                     id="noncurrent-version-transitions-to-glacier",
                     noncurrent_version_transitions=[
                         s3.NoncurrentVersionTransition(
                             storage_class=s3.StorageClass.GLACIER,
-                            transition_after=cdk.Duration.days(to_glacier)
+                            transition_after=cdk.Duration.days(to_lower_after_days)
                         )
                     ],
                     enabled=True
