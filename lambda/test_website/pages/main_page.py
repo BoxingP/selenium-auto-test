@@ -25,6 +25,13 @@ class MainPage(Page):
         self.wait_url_changed_to('signin-identifier.html')
 
     @_step
+    @allure.step('Open registration page')
+    def go_to_registration_page(self):
+        self.hover(*self.locator.my_account_menu)
+        self.click(*self.locator.registration_link)
+        self.wait_url_changed_to('registration')
+
+    @_step
     @allure.step('Search product')
     def search_product(self, words):
         self.input_text(words, *self.locator.search_product_field)

@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 
 
 class PageLocators(object):
+    body = (By.XPATH, '//body')
     html = (By.TAG_NAME, 'html')
 
 
@@ -15,6 +16,7 @@ class MainPageLocators(PageLocators):
     sign_in_link = (By.ID, 'signIn')
     user_profile_menu = (By.ID, 'hfUserProfileLink')
     sign_out_link = (By.ID, 'hfB2cCmgtSignOutLink')
+    registration_link = (By.XPATH, '//div[@id="myaccount-div"]/div[1]/p/a[2]')
     my_cart = (By.ID, 'viewMiniCart')
     header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
     app_tech_link = (By.XPATH, '//ul[@id="meganav-content"]/li[2]/a')
@@ -36,6 +38,25 @@ class LoginPageLocators(PageLocators):
     sign_in_button = (By.ID, 'signin-button')
     login_error = (By.XPATH, '//div[@id="login-error-text"]//span[@class="error-label"]')
     login_error_message = (By.ID, 'login-error-text')
+
+
+class RegistrationPageLocators(PageLocators):
+    last_name_field = (By.XPATH, '//div[@id="fields"]/app-form-input[1]/div/input')
+    first_name_field = (By.XPATH, '//div[@id="fields"]/app-form-input[2]/div/input')
+    email_field = (By.XPATH, '//div[@id="email"]/input')
+    password_field = (By.ID, 'reg-form-password')
+    job_dropdown = (By.XPATH, '//div[@id="fields"]/div[3]/app-custom-dropdown/div/button')
+    other_in_job_dropdown = (By.XPATH, '//div[@id="fields"]/div[3]//li[@id="9"]/label')
+    interest_dropdown = (By.XPATH, '//div[@id="fields"]/div[4]/app-custom-dropdown/div/button')
+    other_in_interest_dropdown = (By.XPATH, '//div[@id="fields"]/div[4]//*[@id="10"]/label')
+    receive_info_button = (By.XPATH, '//div[@id="consent"]/app-consent/div/app-radio-button/div[1]/label')
+    not_receive_info_button = (By.XPATH, '//div[@id="consent"]/app-consent/div/app-radio-button/div[2]/label')
+    company_field = (By.XPATH, '//div[@id="extra-fields"]/div[1]/input')
+    city_field = (By.XPATH, '//div[@id="extra-fields"]/div[2]/input')
+    phone_number_field = (By.XPATH, '//div[@id="extra-fields"]/div[4]/input')
+    create_account_button = (By.ID, 'create-account-button')
+    registration_error = (By.ID, 'toast-container')
+    registration_error_message = (By.XPATH, '//div[@id="toast-container"]/div/div[2]/span/div[1]/div[2]/span')
 
 
 class CartPageLocators(PageLocators):
