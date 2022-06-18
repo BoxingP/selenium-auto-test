@@ -10,8 +10,10 @@ from utils.logger import _step
 
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestCartPage:
+    reruns = 2
+    reruns_delay = 2
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=5)
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Add forgotten product to cart test')
     @allure.description('This is test of add forgotten product to cart')
@@ -21,6 +23,7 @@ class TestCartPage:
         cart_page.add_forgot_item(catalog_number=product['sku'], quantity=product['quantity'])
         assert product['name'] in cart_page.find_element(*CartPageLocators.cart_item_name).text
 
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Open quick order page test')
     @allure.description('This is test of open quick order page')
@@ -32,7 +35,7 @@ class TestCartPage:
         error_msg = '没有已提供的产品信息'
         assert error_msg in cart_page.find_element(*CartPageLocators.fill_out_error_msg).text
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=5)
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Checkout order test')
     @allure.description('This is test of checkout order')

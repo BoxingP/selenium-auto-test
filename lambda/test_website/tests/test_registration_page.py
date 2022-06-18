@@ -9,7 +9,10 @@ from utils.logger import _step
 
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestRegistrationPage:
+    reruns = 2
+    reruns_delay = 2
 
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Register with existing user test')
     @allure.description('This is test of register with existing user')

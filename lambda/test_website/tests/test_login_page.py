@@ -9,8 +9,10 @@ from utils.logger import _step
 
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestLoginPage:
+    reruns = 2
+    reruns_delay = 2
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=5)
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Login with invalid user test')
     @allure.description('This is test of login with invalid user')
@@ -23,7 +25,7 @@ class TestLoginPage:
         error_msg = '用户名称或密码不正确'
         assert error_msg in login_page.find_element(*LoginPageLocators.login_error_message).text
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=5)
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Login with valid user test')
     @allure.description('This is test of login with valid user')

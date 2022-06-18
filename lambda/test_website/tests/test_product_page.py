@@ -8,8 +8,10 @@ from utils.logger import _step
 
 @pytest.mark.usefixtures('setup', 'website_setup')
 class TestProductPage:
+    reruns = 2
+    reruns_delay = 2
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=5)
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
     @allure.title('Add product to cart test')
     @allure.description('This is test of add product to cart')
