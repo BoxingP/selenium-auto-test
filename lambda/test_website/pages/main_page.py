@@ -32,6 +32,13 @@ class MainPage(Page):
         self.wait_url_changed_to('registration')
 
     @_step
+    @allure.step('Open account page')
+    def go_to_account_page(self):
+        self.hover(*self.locator.user_profile_menu)
+        self.click(*self.locator.account_link)
+        self.wait_url_changed_to('accounts')
+
+    @_step
     @allure.step('Search product')
     def search_product(self, words):
         self.input_text(words, *self.locator.search_product_field)

@@ -17,6 +17,7 @@ class MainPageLocators(PageLocators):
     user_profile_menu = (By.ID, 'hfUserProfileLink')
     sign_out_link = (By.ID, 'hfB2cCmgtSignOutLink')
     registration_link = (By.XPATH, '//div[@id="myaccount-div"]/div[1]/p/a[2]')
+    account_link = (By.XPATH, '//div[@id="myaccount-div"]/div/div[2]/div/li[2]/a')
     my_cart = (By.ID, 'viewMiniCart')
     header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
     yellow_thin_banner = (By.XPATH, '//div[contains(@class, "thinbanner")]/a')
@@ -88,3 +89,8 @@ class ProductPageLocators(PageLocators):
     add_to_cart_button = (By.XPATH, '//div[@id="root"]//div[@class="pdp-actions"]/div/div/span/button')
     added_product_info = (By.XPATH, '//div[@id="cartletCartInfo"]//div[@class="cartlet-cart-items"]//div[contains(@class, "added-to-cart-item-info")]//a/span')
     view_cart_button = (By.XPATH, '//div[@id="cartletCartInfo"]//div[contains(@class, "cart-link-buttons") and not(contains(@class, "mobile"))]//a[@href="/store/cart"]')
+
+
+class AccountPageLocators(PageLocators):
+    order_history_link = (By.XPATH, '//div[@id="root"]//div[@class="nav-container"]/div/div[3]/div[2]/div/div[1]/a')
+    order_history_record = (By.XPATH, '//div[@id="root"]/div/div[2]/div/table/tbody/tr')
