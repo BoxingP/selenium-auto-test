@@ -21,7 +21,6 @@ class TestProductPage:
         quantity = product['quantity']
         product_page = ProductPage(self.driver, config)
         product_page.open_page(f"order/catalog/product/{catalog_number}?cid={config['cid']}")
-        product_page.wait_element_to_be_clickable(*ProductPageLocators.save_to_list_button)
         product_page.add_product(catalog_number=catalog_number, product_name=product_name, quantity=quantity)
         product_page.go_to_cart_page()
         assert product_name in product_page.find_element(*CartPageLocators.cart_item_name).text

@@ -19,7 +19,6 @@ class MainPageLocators(PageLocators):
     registration_link = (By.XPATH, '//div[@id="myaccount-div"]/div[1]/p/a[2]')
     my_cart = (By.ID, 'viewMiniCart')
     header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
-    app_tech_link = (By.XPATH, '//ul[@id="meganav-content"]/li[2]/a')
     yellow_thin_banner = (By.XPATH, '//div[contains(@class, "thinbanner")]/a')
     top_banner = (By.ID, 'ggBox')
     landscape_banner = (By.XPATH, '//div[@id="landscapeBannerContent"]/a')

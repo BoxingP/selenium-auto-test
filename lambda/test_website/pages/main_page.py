@@ -37,3 +37,46 @@ class MainPage(Page):
         self.input_text(words, *self.locator.search_product_field)
         self.click(*self.locator.search_product_button)
         self.wait_element_to_be_visible(*self.locator.search_product_result)
+
+    @_step
+    @allure.step('Check header banner exists')
+    def check_header_banner_exists(self):
+        if self.is_element_exists(*self.locator.header_banner) \
+                and self.is_element_clickable(*self.locator.header_banner):
+            return True
+        else:
+            return False
+
+    @_step
+    @allure.step('Check yellow thin banner exists')
+    def check_yellow_thin_banner_exists(self):
+        if self.is_element_exists(*self.locator.yellow_thin_banner) \
+                and self.is_element_clickable(*self.locator.yellow_thin_banner):
+            return True
+        else:
+            return False
+
+    @_step
+    @allure.step('Check top banner exists')
+    def check_top_banner_exists(self):
+        self.wait_element_to_be_visible(*self.locator.top_banner)
+        return True if self.is_element_exists(*self.locator.top_banner) else False
+
+    @_step
+    @allure.step('Check landscape banner exists')
+    def check_landscape_banner_exists(self):
+        self.scroll_page(direction='down')
+        if self.is_element_exists(*self.locator.landscape_banner) \
+                and self.is_element_clickable(*self.locator.landscape_banner):
+            return True
+        else:
+            return False
+
+    @_step
+    @allure.step('Check order index exists')
+    def check_order_index_exists(self):
+        if self.find_element(*self.locator.order_index_img).is_displayed() \
+                and self.is_element_clickable(*self.locator.order_index_img):
+            return True
+        else:
+            return False

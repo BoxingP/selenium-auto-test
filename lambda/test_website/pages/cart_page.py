@@ -15,7 +15,7 @@ class CartPage(Page):
 
     @_step
     @allure.step('Add forgot item by catalog number: {catalog_number}')
-    def add_forgot_item(self, catalog_number, quantity=None):
+    def add_forgot_item_to_cart(self, catalog_number, quantity=None):
         self.input_text(catalog_number, *self.locator.forgot_item_catalog_number_field)
         if quantity is not None:
             self.input_text(quantity, *self.locator.forgot_item_quantity_field, is_overwrite=True)
@@ -33,9 +33,11 @@ class CartPage(Page):
     @_step
     @allure.step('Quick add items')
     def quick_add_item(self, catalog_number, quantity):
-        self.input_text(catalog_number, *self.locator.quick_add_catalog_number_field)
+        self.input_text(catalog_number, *self.locator.quick_add_catalog_number_field, is_overwrite=True)
         self.input_text(quantity, *self.locator.quick_add_quantity_field, is_overwrite=True)
         self.click(*self.locator.quick_add_product_to_cart_button)
+        if catalog_number == '' or quantity == '':
+            self.wait_element_to_be_visible(*self.locator.fill_out_error_msg)
 
     @_step
     @allure.step('Go to order details page')

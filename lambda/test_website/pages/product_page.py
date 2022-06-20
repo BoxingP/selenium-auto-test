@@ -13,6 +13,7 @@ class ProductPage(Page):
     @_step
     @allure.step('Add product by catalog number: {catalog_number}')
     def add_product(self, catalog_number, product_name, quantity):
+        self.wait_element_to_be_clickable(*self.locator.save_to_list_button)
         self.input_text('9999', *self.locator.product_quantity_field, is_overwrite=True)
         retry = 0
         while self.find_element(*self.locator.product_quantity_field).get_attribute("value") != '':

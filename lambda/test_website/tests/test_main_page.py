@@ -29,11 +29,7 @@ class TestMainPage:
     def test_header_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
-        assert main_page.is_element_exists(*MainPageLocators.header_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.header_banner)
-        main_page.click(*MainPageLocators.app_tech_link)
-        assert main_page.is_element_exists(*MainPageLocators.header_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.header_banner)
+        assert main_page.check_header_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
@@ -42,11 +38,7 @@ class TestMainPage:
     def test_yellow_thin_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
-        assert main_page.is_element_exists(*MainPageLocators.yellow_thin_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.yellow_thin_banner)
-        main_page.click(*MainPageLocators.app_tech_link)
-        assert main_page.is_element_exists(*MainPageLocators.yellow_thin_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.yellow_thin_banner)
+        assert main_page.check_yellow_thin_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
@@ -55,8 +47,7 @@ class TestMainPage:
     def test_top_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
-        main_page.wait_element_to_be_visible(*MainPageLocators.top_banner)
-        assert main_page.is_element_exists(*MainPageLocators.top_banner)
+        assert main_page.check_top_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
@@ -64,15 +55,8 @@ class TestMainPage:
     @allure.description('This is test of check landscape banner exists on pages')
     def test_landscape_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
-        main_page.scroll_page(direction='down')
-        assert main_page.is_element_exists(*MainPageLocators.landscape_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.landscape_banner)
-        main_page.scroll_page(direction='up')
-        main_page.click(*MainPageLocators.logo_image)
-        main_page.scroll_page(direction='down')
-        assert main_page.is_element_exists(*MainPageLocators.landscape_banner) \
-               and main_page.is_element_clickable(*MainPageLocators.landscape_banner)
+        main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
+        assert main_page.check_landscape_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
@@ -81,8 +65,7 @@ class TestMainPage:
     def test_order_index_exists(self, config):
         main_page = MainPage(self.driver, config)
         main_page.open_page(f"cn/zh/home/order.html?cid={config['cid']}")
-        assert main_page.find_element(*MainPageLocators.order_index_img).is_displayed() \
-               and main_page.is_element_clickable(*MainPageLocators.order_index_img)
+        assert main_page.check_order_index_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step

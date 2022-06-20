@@ -68,7 +68,6 @@ class Page(object):
         else:
             return False
 
-    @_step
     @allure.step('Scrolling page {direction}')
     def scroll_page(self, direction):
         html = self.find_element(*self.locator.html)
