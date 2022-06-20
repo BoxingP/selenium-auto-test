@@ -28,7 +28,7 @@ class TestMainPage:
     @allure.description('This is test of check header banner exists on pages')
     def test_header_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
+        main_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
         assert main_page.check_header_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
@@ -37,7 +37,7 @@ class TestMainPage:
     @allure.description('This is test of check yellow thin banner exists on pages')
     def test_yellow_thin_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
+        main_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
         assert main_page.check_yellow_thin_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
@@ -55,7 +55,7 @@ class TestMainPage:
     @allure.description('This is test of check landscape banner exists on pages')
     def test_landscape_banner_exists(self, config):
         main_page = MainPage(self.driver, config)
-        main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
+        main_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
         assert main_page.check_landscape_banner_exists()
 
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
