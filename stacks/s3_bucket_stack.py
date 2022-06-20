@@ -32,6 +32,7 @@ class S3BucketStack(cdk.Stack):
             incomplete=get_config_value('bucket.delete_incomplete_after_days', config),
             is_versioned=is_versioned,
             is_expired=get_config_value('bucket.expired', config),
+            prefix=get_config_value('bucket.prefix', config),
             expiration=get_config_value('bucket.expire_after_days', config),
             noncurrent_expiration=get_config_value('bucket.expire_after_days', config),
             is_transition=get_config_value('bucket.moved', config),
@@ -56,7 +57,7 @@ class S3BucketStack(cdk.Stack):
                       value=s3_bucket.bucket_name)
 
     @staticmethod
-    def lifecycle_rules(bucket, incomplete: int, is_versioned: bool, is_expired: bool, expiration: int,
+    def lifecycle_rules(bucket, incomplete: int, is_versioned: bool, is_expired: bool, expiration: int, prefix: str,
                         is_transition: bool, noncurrent_expiration: int, to_lower_after_days: int):
         bucket.add_lifecycle_rule(
             id="abort-incomplete-multipart-upload",
@@ -66,6 +67,7 @@ class S3BucketStack(cdk.Stack):
         if is_expired:
             bucket.add_lifecycle_rule(
                 id="expiration",
+                prefix=prefix,
                 expiration=cdk.Duration.days(expiration),
                 enabled=True
             )
@@ -84,6 +86,7 @@ class S3BucketStack(cdk.Stack):
             if is_expired:
                 bucket.add_lifecycle_rule(
                     id="noncurrent-version-expiration",
+                    prefix=prefix,
                     noncurrent_version_expiration=cdk.Duration.days(noncurrent_expiration),
                     enabled=True
                 )

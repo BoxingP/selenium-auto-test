@@ -58,6 +58,7 @@ aws:
       expire_after_days: 60
       moved: False
       move_to_lower_storage_class_after_days: 30
+      prefix: 'allure_reports/*'
       public_dir: *screenshots
   sns:
     topic: 'Tell Listeners That There Are Tests Failed on {{ test_site.capitalize() }}'
