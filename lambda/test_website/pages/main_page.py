@@ -82,6 +82,7 @@ class MainPage(Page):
     @_step
     @allure.step('Check order index exists')
     def check_order_index_exists(self):
+        self.wait_element_to_be_visible(*self.locator.order_index_container)
         if self.find_element(*self.locator.order_index_img).is_displayed() \
                 and self.is_element_clickable(*self.locator.order_index_img):
             return True
