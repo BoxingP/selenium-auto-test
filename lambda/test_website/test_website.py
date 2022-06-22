@@ -49,9 +49,13 @@ def lambda_handler(event, context):
     generate_env_properties(allure_results_dir, config)
     s3.upload_files_to_s3(local_directory=allure_results_dir, s3_directory=config['allure_results_dir'])
     s3.upload_files_to_s3(local_directory=screenshots_dir, s3_directory=config['screenshots_dir'])
-    s3.upload_files_to_s3(local_directory=logs_dir, s3_directory=config['logs_dir'], is_replace=True)
-    with open(json_report_file, 'r', encoding='utf-8') as file:
+    with open(os.path.join(logs_dir, 'steps.log'), 'r', encoding='utf-8') as file:
+        log = file.read()
+    with open(json_report_file, 'r+', encoding='utf-8') as file:
         report = json.loads(file.read())
+        report['report']['log'] = log
+        file.seek(0)
+        json.dump(report, file, indent=4)
     empty_directory(directory=tmp_dir)
 
     return report

@@ -50,28 +50,19 @@ def generate_allure_reports(s3, local_path):
     s3.empty_s3_directory(s3_directory=os.path.join(result_path, '').replace('\\', '/'))
 
 
-def save_log_to_db(s3, local_path):
-    logs_path = 'logs'
-    local_logs_path = os.path.join(local_path, logs_path)
-    local_log_file = os.path.join(local_logs_path, 'steps.log')
-    s3.download_files_from_s3(local_path=local_path, s3_directory=os.path.join(logs_path, '').replace('\\', '/'))
+def save_log_to_db(log: str):
     log_database = Database()
-    with open(local_log_file) as file:
-        lines = file.readlines()
-    if lines:
-        for line in lines:
+    if log != '':
+        for line in log.split('\n'):
+            if line == '':
+                continue
             log = Log(line)
             log_database.insert_log(log)
-    s3.empty_s3_directory(s3_directory=os.path.join(logs_path, '').replace('\\', '/'))
 
 
 def lambda_handler(event, context):
     local_path = os.path.join(os.path.abspath(os.sep), 'tmp')
     s3 = S3Bucket(s3_bucket=os.environ['s3_bucket_name'])
     generate_allure_reports(s3, local_path)
-    save_log_to_db(s3, local_path)
+    save_log_to_db(event['report']['log'])
     empty_directory(local_path)
-
-
-if __name__ == '__main__':
-    lambda_handler(None, None)
