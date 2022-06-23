@@ -61,7 +61,7 @@ class RegistrationPage(Page):
     def select_job(self):
         self.click(*self.locator.job_dropdown),
         random_sleep()
-        self.click(*self.locator.other_in_job_dropdown)
+        self.click(*self.locator.jobs_in_job_dropdown)
         random_sleep()
         self.click(*self.locator.job_dropdown)
         random_sleep()
@@ -69,7 +69,7 @@ class RegistrationPage(Page):
     def select_interest(self):
         self.click(*self.locator.interest_dropdown)
         random_sleep()
-        self.click(*self.locator.other_in_interest_dropdown)
+        self.click(*self.locator.interests_in_interest_dropdown)
         random_sleep()
         self.click(*self.locator.interest_dropdown)
         random_sleep()

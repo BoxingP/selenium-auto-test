@@ -1,3 +1,5 @@
+import random
+
 from selenium.webdriver.common.by import By
 
 
@@ -47,9 +49,9 @@ class RegistrationPageLocators(PageLocators):
     email_field = (By.XPATH, '//div[@id="email"]/input')
     password_field = (By.ID, 'reg-form-password')
     job_dropdown = (By.XPATH, '//div[@id="fields"]/div[3]/app-custom-dropdown/div/button')
-    other_in_job_dropdown = (By.XPATH, '//div[@id="fields"]/div[3]//li[@id="9"]/label')
+    jobs_in_job_dropdown = (By.XPATH, f'//div[@id="fields"]/div[3]//li[@id="{random.randrange(10)}"]/label')
     interest_dropdown = (By.XPATH, '//div[@id="fields"]/div[4]/app-custom-dropdown/div/button')
-    other_in_interest_dropdown = (By.XPATH, '//div[@id="fields"]/div[4]//*[@id="10"]/label')
+    interests_in_interest_dropdown = (By.XPATH, f'//div[@id="fields"]/div[4]//*[@id="{random.randrange(11)}"]/label')
     receive_info_button = (By.XPATH, '//div[@id="consent"]/app-consent/div/app-radio-button/div[1]/label')
     not_receive_info_button = (By.XPATH, '//div[@id="consent"]/app-consent/div/app-radio-button/div[2]/label')
     company_field = (By.XPATH, '//div[@id="extra-fields"]/div[1]/input')
