@@ -86,3 +86,14 @@ class TestMainPage:
         main_page.open_page("https://www.thermofisher.com/covid19-flu", is_overwrite=True)
         link = 'covid19-influenza-rsv-infographic'
         assert link in main_page.get_url()
+
+    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
+    @_step
+    @allure.title('Online chat test')
+    @allure.description('This is test of online chat opening')
+    def test_online_chat_opening(self, config):
+        main_page = MainPage(self.driver, config)
+        main_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
+        main_page.open_online_chat()
+        title = '为您服务'
+        assert title in main_page.find_element(*MainPageLocators.online_chat_message).text

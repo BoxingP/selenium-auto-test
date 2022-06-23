@@ -88,3 +88,11 @@ class MainPage(Page):
             return True
         else:
             return False
+
+    @_step
+    @allure.step('Open online chat')
+    def open_online_chat(self):
+        self.wait_element_to_be_visible(*self.locator.online_chat_button)
+        self.click(*self.locator.online_chat_button)
+        self.wait_frame_to_be_visible(*self.locator.online_chat_frame)
+        self.wait_element_to_be_visible(*self.locator.online_chat_title)

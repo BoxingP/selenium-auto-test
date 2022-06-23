@@ -31,6 +31,10 @@ class MainPageLocators(PageLocators):
     search_product_button = (By.ID, 'searchButton')
     search_product_result = (By.XPATH, '//div[@id="mainContent"]//div[@class="utility-bar-content"]/span')
     search_matched_product = (By.XPATH, '//div[@id="mainContent"]//h2/a[@data-res_pos="1"]')
+    online_chat_frame = (By.ID, 'ymIframe')
+    online_chat_button = (By.ID, 'ymDivCircle')
+    online_chat_title = (By.XPATH, '//div[@id="chatDetails"]/div[1]')
+    online_chat_message = (By.XPATH, '//div[@id="chatBoxMain"]/div[1]/div')
 
 
 class LoginPageLocators(PageLocators):

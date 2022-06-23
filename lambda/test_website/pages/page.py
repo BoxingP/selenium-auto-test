@@ -118,3 +118,11 @@ class Page(object):
         except TimeoutException:
             print('\n URL NOT CHANGED TO %s WITHIN %s SECONDS! --> CURRENT URL IS %s' % (url, timeout, self.get_url()))
             Screenshot.take_screenshot(self.driver, self.config, f'url not changed to {url}')
+
+    def wait_frame_to_be_visible(self, *locator):
+        timeout = self.config['timeout']
+        try:
+            WebDriverWait(self.driver, timeout=timeout).until(EC.frame_to_be_available_and_switch_to_it(locator))
+        except TimeoutException:
+            print('\n * FRAME NOT VISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
+            Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
