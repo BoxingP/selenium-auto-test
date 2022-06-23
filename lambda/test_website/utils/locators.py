@@ -101,3 +101,6 @@ class ProductPageLocators(PageLocators):
 class AccountPageLocators(PageLocators):
     order_history_link = (By.XPATH, '//div[@id="root"]//div[@class="nav-container"]/div/div[3]/div[2]/div/div[1]/a')
     order_history_record = (By.XPATH, '//div[@id="root"]/div/div[2]/div/table/tbody/tr')
+    personal_profile_link = (By.XPATH, '//div[@id="root"]//div[@class="nav-container"]/div/div[4]/div[1]/h6/a')
+    billing_account_field = (By.XPATH, '//div[@id="root"]//div[@class="shipping-billing-section"]/div[3]/div[2]/span[2]')
+    shipping_account_field = (By.XPATH, '//div[@id="root"]//div[@class="shipping-billing-section"]/div[2]/div[2]/span[2]')
