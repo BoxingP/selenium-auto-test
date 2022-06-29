@@ -44,7 +44,7 @@ def lambda_handler(event, context):
         os.makedirs(logs_dir)
 
     pytest.main(
-        [tests_dir, f"--alluredir={allure_results_dir}", '--cache-clear', f"--json={json_report_file}", '-n', '5']
+        [tests_dir, "--dist=loadfile", "--order-dependencies", f"--alluredir={allure_results_dir}", '--cache-clear', f"--json={json_report_file}", '-n', '5']
     )
     generate_env_properties(allure_results_dir, config)
     s3.upload_files_to_s3(local_directory=allure_results_dir, s3_directory=config['allure_results_dir'])

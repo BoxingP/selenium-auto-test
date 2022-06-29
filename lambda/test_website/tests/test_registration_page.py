@@ -1,7 +1,7 @@
 import allure
 import pytest
 
-from pages.main_page import MainPage
+from pages.home_page import HomePage
 from pages.registration_page import RegistrationPage
 from utils.locators import RegistrationPageLocators
 from utils.logger import _step
@@ -17,7 +17,7 @@ class TestRegistrationPage:
     @allure.title('Register with existing user test')
     @allure.description('This is test of register with existing user')
     def test_register_with_existing_user(self, config):
-        registration_page = MainPage(self.driver, config)
+        registration_page = HomePage(self.driver, config)
         registration_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
         registration_page.go_to_registration_page()
         registration_page = RegistrationPage(self.driver, config)

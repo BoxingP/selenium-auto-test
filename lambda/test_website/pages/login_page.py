@@ -1,7 +1,7 @@
 import allure
 
 from pages.page import Page
-from utils.locators import LoginPageLocators, MainPageLocators
+from utils.locators import LoginPageLocators, HomePageLocators
 from utils.logger import _step
 from utils.users import User
 
@@ -13,7 +13,7 @@ class LoginPage(Page):
 
     @_step
     @allure.step('Login with user: {user}')
-    def login(self, user, is_valid):
+    def login(self, user, is_valid, save_cookie=False):
         user = User().get_user(user)
         self.input_text(user['email'], *self.locator.username_field)
         self.click(*self.locator.next_button)
@@ -22,13 +22,15 @@ class LoginPage(Page):
         if is_valid:
             self.wait_url_changed_to('proxy.html')
             self.wait_url_changed_to('home.html')
-            self.wait_element(*MainPageLocators.user_profile_menu)
+            self.wait_element(*HomePageLocators.user_profile_menu)
+            if save_cookie:
+                self.save_cookie(user['name'])
         else:
             self.wait_element(*self.locator.login_error)
 
     @_step
     @allure.step('Logout')
     def logout(self):
-        self.hover(*MainPageLocators.user_profile_menu)
-        self.click(*MainPageLocators.sign_out_link)
-        self.wait_element(*MainPageLocators.logo_image)
+        self.hover(*HomePageLocators.user_profile_menu)
+        self.click(*HomePageLocators.sign_out_link)
+        self.wait_element(*HomePageLocators.logo_image)

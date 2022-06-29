@@ -1,3 +1,7 @@
+import os
+import pickle
+import time
+
 import allure
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
@@ -126,3 +130,37 @@ class Page(object):
         except TimeoutException:
             print('\n * FRAME NOT VISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
+
+    @_step
+    @allure.step('Saving the cookie')
+    def save_cookie(self, username: str):
+        cookie_path = os.path.join(os.path.abspath(os.sep), 'tmp', f'{username}_cookie.pkl')
+        with open(cookie_path, 'wb') as file:
+            pickle.dump(self.driver.get_cookies(), file)
+
+    def is_cookie_expired(self, cookies):
+        for cookie in cookies:
+            if all(key in cookie for key in ('name', 'expiry')):
+                if cookie['name'] == 'tokenExpiration':
+                    if int(cookie['expiry']) <= int(time.time()):
+                        return True
+                    else:
+                        return False
+        return True
+
+    @_step
+    @allure.step('Loading the cookie')
+    def load_cookie(self, username: str):
+        try:
+            cookie_path = os.path.join(os.path.abspath(os.sep), 'tmp', f'{username}_cookie.pkl')
+            with open(cookie_path, 'rb') as file:
+                cookies = pickle.load(file)
+            if self.is_cookie_expired(cookies):
+                return False
+            else:
+                for cookie in cookies:
+                    self.driver.add_cookie(cookie)
+                self.driver.refresh()
+                return True
+        except FileNotFoundError:
+            return False

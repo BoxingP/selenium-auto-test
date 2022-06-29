@@ -10,10 +10,6 @@ class PageLocators(object):
 
 class HomePageLocators(PageLocators):
     logo_image = (By.ID, 'hfLifetechLogoImage')
-
-
-class MainPageLocators(PageLocators):
-    logo_image = (By.ID, 'hfLifetechLogoImage')
     my_account_menu = (By.ID, 'myaccount-button')
     sign_in_link = (By.ID, 'signIn')
     user_profile_menu = (By.ID, 'hfUserProfileLink')

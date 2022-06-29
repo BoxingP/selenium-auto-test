@@ -51,7 +51,7 @@ def get_failed_tests(json_data: json, directory: str):
                                                   '%Y-%m-%d %H:%M:%S.%f%z')
     start_flag = tests_started_at.strftime('%Y%m%d%H%M%S')
     for test in json_data['report']['tests']:
-        if test['outcome'] == 'passed':
+        if test['outcome'] in ['passed', 'skipped']:
             continue
         name = '::'.join(test['name'].split('::')[-2:])
         stage_outcome = []
@@ -59,7 +59,7 @@ def get_failed_tests(json_data: json, directory: str):
         for key in ('name', 'duration', 'run_index', 'outcome'):
             test.pop(key, None)
         for stage in test.values():
-            if stage['outcome'] == 'passed':
+            if stage['outcome'] in ['passed', 'skipped']:
                 continue
             stage_outcome.append('%s %s' % (stage['name'], stage['outcome']))
             detail = ''
