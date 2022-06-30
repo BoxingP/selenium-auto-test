@@ -55,7 +55,7 @@ aws:
       versioned: False
       delete_incomplete_after_days: 7
       expired: True
-      expire_after_days: 60
+      expire_after_days: 30
       moved: False
       move_to_lower_storage_class_after_days: 30
       prefix: 'allure_reports/*'
@@ -66,7 +66,7 @@ aws:
     subscribers: [{% for subscriber in subscribers %}'{{ subscriber }}'{{ "," if not loop.last else "" }} {% endfor %}]
   step_functions:
     event_bridge:
-      schedule: 'cron(*/15 1-9 ? * MON-FRI *)'
+      schedule: 'cron(*/5 1-9 ? * MON-FRI *)'
     sns:
       subject: *subject
     timeout:
@@ -74,7 +74,7 @@ aws:
       test_website: *test
       generate_report: *generate
       parse_report: *parse
-      total: 960
+      total: 1200
   tags:
     Name:
     app role:
