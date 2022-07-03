@@ -3,6 +3,14 @@
 Create the Selenium automation test running environment by using the AWS Cloud Development Kit (AWS CDK).
 Use the AMI built by [AWS EC2 Image Builder](https://github.com/BoxingP/aws-image-builder).
 
+## Principle
+
+![Principle](principle.png?raw=true "Principle")
+
+## Architecture
+
+![Architecture](architecture.png?raw=true "Architecture")
+
 Below SQLs are to create the database and table to store the logs:
 
 ### create database
