@@ -38,7 +38,7 @@ class TestHomePage:
     @allure.description('This is test of check yellow thin banner exists on pages')
     def test_yellow_thin_banner_exists(self, config):
         home_page = HomePage(self.driver, config)
-        home_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
+        home_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
         assert home_page.check_yellow_thin_banner_exists()
 
     @pytest.mark.dependency(depends=["home"], scope="session")
