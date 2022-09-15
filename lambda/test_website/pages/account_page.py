@@ -44,7 +44,7 @@ class AccountPage(Page):
     @allure.step('Check shipping address exists')
     def check_shipping_address_exists(self, user):
         user = User().get_user(user)
-        if user['shipping_account'] == self.find_element(*self.locator.shipping_account_field).text:
+        if user['shipping_account'] in self.find_element(*self.locator.shipping_account_field).text:
             return True
         else:
             return False
