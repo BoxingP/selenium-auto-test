@@ -80,10 +80,10 @@ class CartPageLocators(PageLocators):
     empty_cart_button = (By.XPATH, '//div[@id="cartContent"]/form//a[contains(@class, "line-item-empty")]')
     confirm_empty_cart_button = (By.XPATH, '//div[@id="empty-cart-modal"]//div/button[contains(@class, "primary-action")]')
     cart_emptied_msg = (By.XPATH, '//div[@id="cartContent"]//div/div/span[contains(@class, "strong-alt")]')
-    quick_add_catalog_number_field = (By.XPATH, '//div[contains(@class, "quick-order")]//table/tbody[1]/tr/td[1]/input')
-    quick_add_quantity_field = (By.XPATH, '//div[contains(@class, "quick-order")]//table/tbody[1]/tr/td[2]/input')
-    quick_add_product_to_cart_button = (By.XPATH, '//div[contains(@class, "quick-order-app")]//div[contains(@class, "quick-order")]//form/div/div/button[2]')
-    fill_out_error_msg = (By.XPATH, '//div[@class="container-wrap"]//form/div/div[3]/div')
+    quick_add_catalog_number_field = (By.ID, 'catalogNumber__0')
+    quick_add_quantity_field = (By.ID, 'quantity__0')
+    quick_add_product_to_cart_button = (By.XPATH, '//div[contains(@class, "qck-order")]//form/div/div/button[2]')
+    fill_out_error_msg = (By.XPATH, '//div[@class="error-msg"]/span')
 
 
 class ProductPageLocators(PageLocators):
