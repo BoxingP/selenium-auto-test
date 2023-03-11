@@ -34,42 +34,12 @@ class TestHomePage:
     @pytest.mark.dependency(depends=["home"], scope="session")
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
     @_step
-    @allure.title('Check yellow thin banner exists test')
-    @allure.description('This is test of check yellow thin banner exists on pages')
-    def test_yellow_thin_banner_exists(self, config):
-        home_page = HomePage(self.driver, config)
-        home_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
-        assert home_page.check_yellow_thin_banner_exists()
-
-    @pytest.mark.dependency(depends=["home"], scope="session")
-    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
-    @_step
     @allure.title('Check top banner exists test')
     @allure.description('This is test of check top banner exists on home page')
     def test_top_banner_exists(self, config):
         home_page = HomePage(self.driver, config)
         home_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
         assert home_page.check_top_banner_exists()
-
-    @pytest.mark.dependency(depends=["home"], scope="session")
-    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
-    @_step
-    @allure.title('Check landscape banner exists test')
-    @allure.description('This is test of check landscape banner exists on pages')
-    def test_landscape_banner_exists(self, config):
-        home_page = HomePage(self.driver, config)
-        home_page.open_page(f"cn/zh/home/applications-techniques.html?cid={config['cid']}")
-        assert home_page.check_landscape_banner_exists()
-
-    @pytest.mark.dependency(depends=["home"], scope="session")
-    @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)
-    @_step
-    @allure.title('Check order index exists test')
-    @allure.description('This is test of check order index exists on page')
-    def test_order_index_exists(self, config):
-        home_page = HomePage(self.driver, config)
-        home_page.open_page(f"cn/zh/home/order.html?cid={config['cid']}")
-        assert home_page.check_order_index_exists()
 
     @pytest.mark.dependency(depends=["home"], scope="session")
     @pytest.mark.flaky(reruns=reruns, reruns_delay=reruns_delay)

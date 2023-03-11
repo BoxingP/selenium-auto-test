@@ -58,7 +58,7 @@ class TestLoginPage:
         login_page = LoginPage(self.driver, config)
         login_page.login('boxing', is_valid=True, save_cookie=True)
         profile_msg = '账户'
-        assert profile_msg in login_page.find_element(*HomePageLocators.user_profile_menu).text
+        assert profile_msg in login_page.find_element(*HomePageLocators.logged_in_menu).text
         login_page.logout()
 
 

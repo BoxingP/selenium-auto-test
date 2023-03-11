@@ -22,5 +22,5 @@ class TestRegistrationPage:
         registration_page.go_to_registration_page()
         registration_page = RegistrationPage(self.driver, config)
         registration_page.register('boxing', is_exist=True)
-        error_msg = '处理您的请求时出错'
+        error_msg = '该邮箱地址已注册'
         assert error_msg in registration_page.find_element(*RegistrationPageLocators.registration_error_message).text

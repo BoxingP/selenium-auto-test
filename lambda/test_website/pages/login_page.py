@@ -22,7 +22,7 @@ class LoginPage(Page):
         if is_valid:
             self.wait_url_changed_to('proxy.html')
             self.wait_url_changed_to('home.html')
-            self.wait_element(*HomePageLocators.user_profile_menu)
+            self.wait_element(*HomePageLocators.logged_in_menu)
             if save_cookie:
                 self.save_cookie(user['name'])
         else:
@@ -31,6 +31,6 @@ class LoginPage(Page):
     @_step
     @allure.step('Logout')
     def logout(self):
-        self.hover(*HomePageLocators.user_profile_menu)
+        self.click(*HomePageLocators.logged_in_menu)
         self.click(*HomePageLocators.sign_out_link)
         self.wait_element(*HomePageLocators.logo_image)

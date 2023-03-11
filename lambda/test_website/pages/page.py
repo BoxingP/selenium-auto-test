@@ -141,7 +141,7 @@ class Page(object):
     def is_cookie_expired(self, cookies):
         for cookie in cookies:
             if all(key in cookie for key in ('name', 'expiry')):
-                if cookie['name'] == 'tokenExpiration':
+                if cookie['name'] == 'cauthId':
                     if int(cookie['expiry']) <= int(time.time()):
                         return True
                     else:

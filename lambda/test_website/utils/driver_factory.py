@@ -7,7 +7,7 @@ class DriverFactory(object):
     def get_driver(browser, headless_mode=False):
         if browser == 'chrome':
             options = webdriver.ChromeOptions()
-            options.add_argument('--window-size=1920,1100')
+            options.add_argument('--window-size=1920,1200')
             if headless_mode is True:
                 options.add_argument('--headless')
                 options.add_argument("--disable-infobars")

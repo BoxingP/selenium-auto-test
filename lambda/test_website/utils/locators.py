@@ -9,20 +9,17 @@ class PageLocators(object):
 
 
 class HomePageLocators(PageLocators):
-    logo_image = (By.ID, 'hfLifetechLogoImage')
-    my_account_menu = (By.ID, 'myaccount-button')
-    sign_in_link = (By.ID, 'signIn')
-    user_profile_menu = (By.ID, 'hfUserProfileLink')
-    sign_out_link = (By.ID, 'hfB2cCmgtSignOutLink')
-    registration_link = (By.XPATH, '//div[@id="myaccount-div"]/div[1]/p/a[2]')
-    account_link = (By.XPATH, '//div[@id="myaccount-div"]/div/div[2]/div/li[2]/a')
-    my_cart = (By.ID, 'viewMiniCart')
+    logo_image = (By.ID, 'Layer_1')
+    sign_in_menu = (By.ID, 'sign-in-toggle')
+    sign_in_button = (By.XPATH, '//li[@id="sign-in"]//div[@id="accounts-dd"]/div/div[1]/div/a')
+    logged_in_menu = (By.ID, 'logged-in-toggle')
+    sign_out_link = (By.XPATH, '//li[@id="logged-in"]//div[@id="accounts-dd"]/div/div/div[4]/a')
+    registration_link = (By.XPATH, '//li[@id="sign-in"]//div[@id="accounts-dd"]/div/div[2]/a[2]')
+    account_link = (By.XPATH, '//li[@id="logged-in"]//li[@id="account-link-1"]/a')
+    cart_menu = (By.XPATH, '(//a[@id="cart-link"]/*)[2]')
+    view_cart_button = (By.XPATH, '//div[@id="cart-sidebar"]/div/div[3]/div[2]/div/a')
     header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
-    yellow_thin_banner = (By.XPATH, '//div[contains(@class, "thinbanner")]/a')
-    top_banner = (By.ID, 'ggBox')
-    landscape_banner = (By.XPATH, '//div[@id="landscapeBannerContent"]/a')
-    order_index_container = (By.XPATH, '//div[@container-id="cq-colctrl-lt1" and @comp-id="B1"]')
-    order_index_img = (By.XPATH, '(//a/div/picture/img)[1]')
+    top_banner = (By.ID, 'dynamicOffer')
     search_product_field = (By.ID, 'suggest1')
     search_product_button = (By.ID, 'searchButton')
     search_product_result = (By.XPATH, '//div[@id="mainContent"]//div[@class="utility-bar-content"]/span')
@@ -56,10 +53,10 @@ class RegistrationPageLocators(PageLocators):
     not_receive_info_button = (By.XPATH, '//div[@id="consent"]/app-consent/div/app-radio-button/div[2]/label')
     company_field = (By.XPATH, '//div[@id="extra-fields"]/div[1]/input')
     city_field = (By.XPATH, '//div[@id="extra-fields"]/div[2]/input')
-    phone_number_field = (By.XPATH, '//div[@id="extra-fields"]/div[4]/input')
+    phone_number_field = (By.XPATH, '//div[@id="extra-fields"]/div[3]/input')
     create_account_button = (By.ID, 'create-account-button')
     registration_error = (By.ID, 'toast-container')
-    registration_error_message = (By.XPATH, '//div[@id="toast-container"]/div/div[2]/span/div[1]/div[2]/span')
+    registration_error_message = (By.XPATH, '//div[@id="email"]/div[2]')
 
 
 class CartPageLocators(PageLocators):
@@ -70,7 +67,7 @@ class CartPageLocators(PageLocators):
     checkout_button = (By.XPATH, '//div[@id="mobileCheckoutButton"]/div/div/button')
     ship_recipient = (By.XPATH, '//div[@class="shipping-billing-cards"]/div[contains(@class, "shipping-card")]//input[@data-testid="attentionTo"]')
     bill_recipient = (By.XPATH, '//div[@class="shipping-billing-cards"]/div[contains(@class, "billing-card")]//input[@data-testid="attentionTo"]')
-    purchase_order_number = (By.XPATH, '//div[contains(@class, "payment-methods")]/div/div/div/div/input')
+    purchase_order_number = (By.XPATH, '//div[contains(@class, "payment-methods")]/div/div[5]/div[1]/div/div/input')
     continue_button = (By.XPATH, '//div[@class="sticky-order-summary"]/div/div/button')
     terms_conditions_accept_button = (By.XPATH, '//div[@class="ck-terms-conditions"]/label')
     terms_conditions_msg = (By.XPATH, '//div[@class="ck-terms-conditions"]/label/div')
@@ -91,7 +88,7 @@ class ProductPageLocators(PageLocators):
     save_to_list_button = (By.XPATH, '//div[@id="root"]//div[@class="pdp-actions"]/div/div/button')
     add_to_cart_button = (By.XPATH, '//div[@id="root"]//div[@class="pdp-actions"]/div/div/span/button')
     added_product_info = (By.XPATH, '//div[@id="cartletCartInfo"]//div[@class="cartlet-cart-items"]//div[contains(@class, "added-to-cart-item-info")]//a/span')
-    view_cart_button = (By.XPATH, '//div[@id="cartletCartInfo"]//div[contains(@class, "cart-link-buttons") and not(contains(@class, "mobile"))]//a[@href="/store/cart"]')
+    view_cart_button = (By.XPATH, '//div[@id="cart-sidebar"]/div/div[3]/div[2]/div/a')
 
 
 class AccountPageLocators(PageLocators):
