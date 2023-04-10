@@ -61,7 +61,7 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.mark.tryfirst
+@pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
     json_path = config.option.json_path
     config.pluginmanager.register(JSONReport(json_path), name='json_report')
