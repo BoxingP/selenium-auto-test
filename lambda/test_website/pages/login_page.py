@@ -34,3 +34,10 @@ class LoginPage(Page):
         self.click(*HomePageLocators.logged_in_menu)
         self.click(*HomePageLocators.sign_out_link)
         self.wait_element(*HomePageLocators.logo_image)
+
+    @_step
+    @allure.step('Redirect to home page')
+    def redirect_to_home(self):
+        self.wait_url_changed_to('proxy.html')
+        self.wait_url_changed_to('home')
+        self.wait_element_to_be_visible(*HomePageLocators.logo_image)
