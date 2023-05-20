@@ -18,8 +18,7 @@ class HomePage(Page):
     @_step
     @allure.step('Go to cart page')
     def go_to_cart_page(self):
-        self.click(*self.locator.cart_menu)
-        self.click(*self.locator.view_cart_button)
+        self.open_page('store/cart')
         self.wait_url_changed_to('cart')
 
     @_step
@@ -73,3 +72,12 @@ class HomePage(Page):
         self.click(*self.locator.online_chat_button)
         self.wait_frame_to_be_visible(*self.locator.online_chat_frame)
         self.wait_element_to_be_visible(*self.locator.online_chat_title)
+        self.wait_element_to_be_visible(*self.locator.online_chat_connection_offline)
+        self.wait_element_to_be_visible(*self.locator.online_chat_connection_online)
+
+    @_step
+    @allure.step('Input message in online chat')
+    def input_message_in_online_chat(self, text):
+        self.input_text(text, *self.locator.online_chat_input_field)
+        self.click(*self.locator.online_chat_send_button)
+        self.wait_element_to_be_invisible(*self.locator.online_chat_typing_state)

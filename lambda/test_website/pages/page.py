@@ -107,6 +107,14 @@ class Page(object):
             print('\n * ELEMENT NOT VISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
             Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not found')
 
+    def wait_element_to_be_invisible(self, *locator):
+        timeout = self.config['timeout']
+        try:
+            WebDriverWait(self.driver, timeout=timeout).until(EC.invisibility_of_element_located(locator))
+        except TimeoutException:
+            print(f'\n * ELEMENT NOT INVISIBLE WITHIN %s SECONDS! --> %s' % (timeout, locator[1]))
+            Screenshot.take_screenshot(self.driver, self.config, f'{locator[1]} not disappeared')
+
     def wait_text_to_be_display(self, text, *locator):
         timeout = self.config['timeout']
         try:

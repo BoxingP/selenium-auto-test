@@ -72,5 +72,6 @@ class TestHomePage:
         home_page = HomePage(self.driver, config)
         home_page.open_page(f"cn/zh/home.html?cid={config['cid']}")
         home_page.open_online_chat()
-        title = '为您服务'
-        assert title in home_page.find_element(*HomePageLocators.online_chat_message).text
+        home_page.input_message_in_online_chat('test')
+        msg = '🙂'
+        assert msg in home_page.find_element(*HomePageLocators.online_chat_message).text

@@ -16,9 +16,7 @@ class HomePageLocators(PageLocators):
     sign_out_link = (By.XPATH, '//li[@id="logged-in"]//div[@id="accounts-dd"]/div/div/div[4]/a')
     registration_link = (By.XPATH, '//li[@id="sign-in"]//div[@id="accounts-dd"]/div/div[2]/a[2]')
     account_link = (By.XPATH, '//li[@id="logged-in"]//li[@id="account-link-1"]/a')
-    cart_menu = (By.XPATH, '(//a[@id="cart-link"]/*)[2]')
-    view_cart_button = (By.XPATH, '//div[@id="cart-sidebar"]/div/div[3]/div[2]/div/a')
-    header_banner = (By.XPATH, '//div[@id="promoBarContent"]/a')
+    header_banner = (By.XPATH, '(//div[@id="dynamicOffer"]/div[1]/a)[1]')
     top_banner = (By.ID, 'dynamicOffer')
     search_product_field = (By.ID, 'suggest1')
     search_product_button = (By.ID, 'searchButton')
@@ -27,7 +25,12 @@ class HomePageLocators(PageLocators):
     online_chat_frame = (By.ID, 'ymIframe')
     online_chat_button = (By.ID, 'ymDivCircle')
     online_chat_title = (By.XPATH, '//div[@id="chatDetails"]/div[1]')
-    online_chat_message = (By.XPATH, '//div[@id="chatBoxMain"]/div[1]/div')
+    online_chat_connection_offline = (By.XPATH, '//div[@class="connection offline"]')
+    online_chat_connection_online = (By.XPATH, '//div[@class="connection online"]')
+    online_chat_input_field = (By.ID, 'ymMsgInput')
+    online_chat_send_button = (By.ID, 'sendIcon')
+    online_chat_typing_state = (By.ID, 'typing')
+    online_chat_message = (By.XPATH, '(//div[@id="chatBoxMain"]/div[contains(@class, "chat-message")])[2]')
 
 
 class LoginPageLocators(PageLocators):
@@ -60,7 +63,7 @@ class RegistrationPageLocators(PageLocators):
 
 
 class CartPageLocators(PageLocators):
-    forgot_item_catalog_number_field = (By.XPATH, '//input[@name="sku" and contains(@class, "tf-input")]')
+    forgot_item_catalog_number_field = (By.ID, 'downshift-2-input')
     forgot_item_quantity_field = (By.XPATH, '//input[@name="qty" and contains(@class, "tf-input")]')
     add_forgot_to_cart_button = (By.XPATH, '//div[@id="cartContent"]//button[not(@id="clearItems")]')
     cart_item_name = (By.XPATH, '//div[@id="cartContent"]/form//div[@class="tf-row"]//div[contains(@class, "catalog-title")]')
