@@ -30,7 +30,7 @@ class HomePageLocators(PageLocators):
     online_chat_input_field = (By.ID, 'ymMsgInput')
     online_chat_send_button = (By.ID, 'sendIcon')
     online_chat_typing_state = (By.ID, 'typing')
-    online_chat_message = (By.XPATH, '(//div[@id="chatBoxMain"]/div[contains(@class, "chat-message")])[2]')
+    online_chat_first_reply_msg = (By.XPATH, '//div[contains(@class, "from-me")]/following-sibling::div[contains(@class, "from-them")][contains(@class, "bot-message")][contains(@class, "first")]')
 
 
 class LoginPageLocators(PageLocators):
